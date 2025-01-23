@@ -33,11 +33,18 @@ protected:  // 컨트롤 모음이 포함된 멤버입니다.
 	CToolBar          m_wndToolBar;
 	CStatusBar        m_wndStatusBar;
 
+public:
+	// CSplitterWnd : 창 분할을 위한 클래스
+	CSplitterWnd		m_MainSplitter;
+	CSplitterWnd		m_SecondSplitter;
+	CSplitterWnd m_ThirdSplitter; // 메인 뷰 밑에 
+
 // 생성된 메시지 맵 함수
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	DECLARE_MESSAGE_MAP()
 
+	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 };
 
 

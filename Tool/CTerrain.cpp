@@ -6,8 +6,8 @@
 #include "CPerformanceTimer.h"
 
 CTerrain::CTerrain() :
-	m_bCanRender(false), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
-	m_dwDrawTileRenderTime(0ULL)
+	m_bCanRender(false), m_pMainView(nullptr),m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
+	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f,0.f))
 {
 }
 
@@ -79,17 +79,34 @@ void CTerrain::Initialize()
 
 		// 타일 위치에 카메라 오프셋 적용
 		D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x + vCameraOffset.x) * fCameraZoom,
-			(tile->vPos.y + vCameraOffset.y) * fCameraZoom,
+			(tile->vPos.x + vCameraOffset.x- m_pMainView->GetScrollPos(0)) * fCameraZoom,
+			(tile->vPos.y + vCameraOffset.y- m_pMainView->GetScrollPos(1)) * fCameraZoom,
 			tile->vPos.z);
 
 		
 		matWorld = matScale * matTrans;
+
+		RECT	rc{};
+
+		GetClientRect(m_pMainView->m_hWnd, &rc);
+
+		float	fX = WINCX / float(rc.right - rc.left);
+		float	fY = WINCY / float(rc.bottom - rc.top);
+
+		Set_Ratio(matWorld, fX, fY);
 	}
 }
 
 void CTerrain::Update()
 {
+	if (GetAsyncKeyState(VK_LEFT))
+		vCameraOffset.x += 10.0f;
+	if (GetAsyncKeyState(VK_RIGHT))
+		vCameraOffset.x -= 10.0f;
+	if (GetAsyncKeyState(VK_UP))
+		vCameraOffset.y += 10.0f;
+	if (GetAsyncKeyState(VK_DOWN))
+		vCameraOffset.y -= 10.0f;
 	float screenCenterX = WINCX / 2.0f;
 	float screenCenterY = WINCY / 2.0f;
 
@@ -110,11 +127,23 @@ void CTerrain::Update()
 		D3DXMatrixScaling(&matScale, fCameraZoom, fCameraZoom, 1.f);
 
 		// 타일 위치에 카메라 오프셋 적용
+		/*D3DXMatrixTranslation(&matTrans,
+			(tile->vPos.x + vCameraOffset.x- m_pMainView->GetScrollPos(0)) * fCameraZoom + zoomOffsetX,
+			(tile->vPos.y + vCameraOffset.y- m_pMainView->GetScrollPos(1)) * fCameraZoom + zoomOffsetY,
+			tile->vPos.z);*/
 		D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x + vCameraOffset.x) * fCameraZoom + zoomOffsetX,
-			(tile->vPos.y + vCameraOffset.y) * fCameraZoom + zoomOffsetY,
+			(tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX,
+			(tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY,
 			tile->vPos.z);
 		matWorld = matScale * matTrans;
+		RECT	rc{};
+
+		GetClientRect(m_pMainView->m_hWnd, &rc);
+
+		float	fX = WINCX / float(rc.right - rc.left);
+		float	fY = WINCY / float(rc.bottom - rc.top);
+
+		Set_Ratio(matWorld, fX, fY);
 		m_vecTileWorldMat[i] = matWorld;
 		tile->bChange = false;
 	}
@@ -132,7 +161,6 @@ void CTerrain::Render()
 	timer.Start();
 #endif
 	const TEXINFO* lastTexInfo = nullptr;
-//	CDevice::Get_Instance()->Get_Sprite()->Begin(D3DXSPRITE_ALPHABLEND);
 	BYTE currentDrawID = 255; // 초기값을 잘못된 값으로 설정
 	for (int i = 0; i < (int)m_vecTile.size(); i++)
 	{
@@ -214,6 +242,45 @@ void CTerrain::Release()
 	for_each(m_vecTile.begin(), m_vecTile.end(), Safe_Delete<TILE*>);
 }
 
+void CTerrain::Mini_Render()
+{  /*  WINDOWINFO wndInfo;
+    GetWindowInfo(m_pMiniView->m_hWnd, &wndInfo);
+    float miniMapWidth = (float)(wndInfo.rcWindow.right - wndInfo.rcWindow.left);
+    float miniMapHeight = (float)(wndInfo.rcWindow.bottom - wndInfo.rcWindow.top);
+
+    float miniMapScale = min(miniMapWidth / WINCX, miniMapHeight / WINCY) * 0.9f;*/
+	const TEXINFO* lastTexInfo = nullptr;
+	BYTE currentDrawID = 255; // 초기값을 잘못된 값으로 설정
+	D3DXMATRIX matWorld,matScale,matTrans;
+	for (int i = 0; i < (int)m_vecTile.size(); i++)
+	{
+		TILE* tile = m_vecTile[i];
+
+		if (currentDrawID != tile->byDrawID)
+		{
+			currentDrawID = tile->byDrawID;
+			lastTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Terrain", L"Tile", currentDrawID);
+		}
+		D3DXVECTOR3 vCenter(tile->vSize.x * 0.5f, tile->vSize.y * 0.5f, 0.f);
+		D3DXMatrixScaling(&matScale, 1.f, 1.f, 1.f);
+		D3DXMatrixTranslation(&matTrans, tile->vPos.x+(float)WINCX, tile->vPos.y+(float)WINCY, tile->vPos.z);
+		matWorld = matScale* matTrans;
+		Set_Ratio(matWorld, 0.3f, 0.3f);
+		RECT	rc{};
+
+		GetClientRect(m_pMainView->m_hWnd, &rc);
+		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
+		if (lastTexInfo)
+		{
+			CDevice::Get_Instance()->Get_Sprite()->Draw(lastTexInfo->pTexture,
+				nullptr,
+				&vCenter,   // 텍스처의 중심점 (중심점을 구해서 이동 시켜야지 잘 그려짐
+				nullptr,    // 이미 matWorld로 위치를 설정했으므로 nullptr
+				D3DCOLOR_ARGB(255, 255, 255, 255));
+		}
+	}
+}
+
 void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 {
 	float screenCenterX = WINCX / 2.0f;
@@ -223,8 +290,8 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
 	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
 	D3DXVECTOR3 adjustedMousePoint = {
-	   (mousePoint.x - vCameraOffset.x) / fCameraZoom,
-	   (mousePoint.y - vCameraOffset.y) / fCameraZoom,
+	   (mousePoint.x - zoomOffsetX) / fCameraZoom+vCameraOffset.x + m_pMainView->GetScrollPos(0),
+	   (mousePoint.y - zoomOffsetY) / fCameraZoom+ vCameraOffset.y +m_pMainView->GetScrollPos(1),
 	   mousePoint.z
 	};
 
@@ -318,12 +385,12 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 	}
 }
 
-void CTerrain::Change_DrawID(bool bUp)
+void CTerrain::Change_DrawID(int iDrawId)
 {
-	fCameraZoom = bUp ? fCameraZoom += 0.1f : max(0.f,fCameraZoom - 0.1f);
+	
 	m_bCanRender = true;
 	m_dwDrawTileRenderTime = GetTickCount64();
-	Set_Picking_DrawId(bUp ? (m_iChangeDrawId + 1) % 36 : (m_iChangeDrawId - 1 < 0 ? m_iChangeDrawId = 35 : m_iChangeDrawId -= 1));
+	Set_Picking_DrawId(iDrawId);
 }
 
 void CTerrain::Render_Current_Draw_Tile()
@@ -353,5 +420,18 @@ void CTerrain::Render_Current_Draw_Tile()
 		&vCenter,   // 텍스처의 중심점    
 		nullptr,    // 이미 matWorld로 위치를 설정했으므로 nullptr
 		D3DCOLOR_ARGB(255, 255, 255, 255));
+}
+
+void CTerrain::Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY)
+{
+	pOut._11 *= _fX;
+	pOut._21 *= _fX;
+	pOut._31 *= _fX;
+	pOut._41 *= _fX;
+		
+	pOut._12 *= _fY;
+	pOut._22 *= _fY;
+	pOut._32 *= _fY;
+	pOut._42 *= _fY;
 }
 

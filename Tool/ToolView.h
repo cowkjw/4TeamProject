@@ -6,9 +6,11 @@
 
 #include "CDevice.h"
 #include "CSingleTexture.h"
-#include "CTerrain.h"
 
-class CToolView : public CView
+class CTerrain;
+class CToolDoc;
+
+class CToolView : public CScrollView
 {
 protected: // serialization에서만 만들어집니다.
 	CToolView() noexcept;
@@ -47,7 +49,7 @@ public:
 	afx_msg void OnDestroy();
 
 
-private:
+public:
 	CDevice*	m_pDevice;
 	CTerrain* m_pTerrain;
 	UINT_PTR m_nTimer;

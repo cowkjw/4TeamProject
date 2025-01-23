@@ -5,8 +5,12 @@
 #include "pch.h"
 #include "framework.h"
 #include "Tool.h"
-
+#include "Include.h"
 #include "MainFrm.h"
+#include "ToolView.h"
+#include "CMyForm.h"
+#include "CMiniView.h"
+#include "CTransformInfo.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,14 +48,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	
+
 
 	return 0;
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CFrameWnd::PreCreateWindow(cs) )
+	if (!CFrameWnd::PreCreateWindow(cs))
 		return FALSE;
 	// TODO: CREATESTRUCT cs를 수정하여 여기에서
 	//  Window 클래스 또는 스타일을 수정합니다.
@@ -76,3 +80,35 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 // CMainFrame 메시지 처리기
 
+
+
+BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
+{
+	m_MainSplitter.CreateStatic(this, 1, 2); // 1행 2열 짜리 만듦
+	// 2번째 행에 메인 뷰
+	//m_MainSplitter.CreateView(0, 1, RUNTIME_CLASS(CToolView), CSize(WINCX, WINCY), pContext);
+
+	//IdFromRowCol(행, 열) : 지정한 행과 열에 해당하는 창의 id 값을 반환
+
+	// 첫번째 행에 2행 1열짜리 만들기
+	m_SecondSplitter.CreateStatic(&m_MainSplitter, 2, 1,
+		WS_CHILD | WS_VISIBLE,
+		m_MainSplitter.IdFromRowCol(0, 0));
+
+	// 미니맵
+	m_SecondSplitter.CreateView(0, 0, RUNTIME_CLASS(CMiniView), CSize(300, 300), pContext);
+	// 다이어로그
+	m_SecondSplitter.CreateView(1, 0, RUNTIME_CLASS(CMyForm), CSize(300, 300), pContext);
+	//SetColumnInfo(열 번호, 열의 크기 지정, 허용 가능한 최소크기)
+
+	m_ThirdSplitter.CreateStatic(&m_MainSplitter, 2, 1,
+		WS_CHILD | WS_VISIBLE,
+		m_MainSplitter.IdFromRowCol(0, 1));
+
+	m_ThirdSplitter.CreateView(0, 0, RUNTIME_CLASS(CToolView), CSize(500, 300), pContext);
+	m_ThirdSplitter.CreateView(1, 0, RUNTIME_CLASS(CTransformInfo), CSize(500, 300), pContext);
+	m_MainSplitter.SetColumnInfo(0, 400, 10); // 1열에 (왼쪽 창) 300을 기본으로 10까지만 줄일 수 있게
+	m_ThirdSplitter.SetRowInfo(0, 600, 10);
+	m_ThirdSplitter.SetRowInfo(1, 100, 10);
+	return TRUE;
+}

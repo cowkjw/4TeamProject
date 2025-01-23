@@ -46,6 +46,27 @@
     <Filter Include="04. Etc\01. Terrain">
       <UniqueIdentifier>{7218ab5d-d802-495c-a4d6-35cc525b2bc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04. Etc\02. Dialog">
+      <UniqueIdentifier>{8f0855c7-6837-4039-a786-02ac1590db37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Etc\02. Dialog\00. MyForm">
+      <UniqueIdentifier>{588b5878-2464-475d-a3b6-1391a58cd84c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Etc\02. Dialog\02. UnitTool">
+      <UniqueIdentifier>{85559aaf-37cd-4b57-be95-caa59c12e00e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Etc\02. Dialog\01. MiniView">
+      <UniqueIdentifier>{054bba14-cb61-403d-964a-ff295efc7d3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Etc\02. Dialog\03. ListBox">
+      <UniqueIdentifier>{0a03ba1b-efaf-4f1a-be4c-5b17e65cead1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Manager\02. KeyManager">
+      <UniqueIdentifier>{ec29e11c-233d-427a-ac2d-75b112d3f212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Etc\02. Dialog\04. FindFileDialog">
+      <UniqueIdentifier>{a988b7ff-9cce-4fe3-8b37-14537d809d5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -93,6 +114,27 @@
     <ClInclude Include="CPerformanceTimer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CMyForm.h">
+      <Filter>04. Etc\02. Dialog\00. MyForm</Filter>
+    </ClInclude>
+    <ClInclude Include="CUnitTool.h">
+      <Filter>04. Etc\02. Dialog\02. UnitTool</Filter>
+    </ClInclude>
+    <ClInclude Include="CMiniView.h">
+      <Filter>04. Etc\02. Dialog\01. MiniView</Filter>
+    </ClInclude>
+    <ClInclude Include="CTransformInfo.h">
+      <Filter>04. Etc\02. Dialog\00. MyForm</Filter>
+    </ClInclude>
+    <ClInclude Include="CTextureListBox.h">
+      <Filter>04. Etc\02. Dialog\03. ListBox</Filter>
+    </ClInclude>
+    <ClInclude Include="CKeyManager.h">
+      <Filter>03. Manager\02. KeyManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CFindFolderTree.h">
+      <Filter>04. Etc\02. Dialog\04. FindFileDialog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -127,6 +169,27 @@
     </ClCompile>
     <ClCompile Include="CTerrain.cpp">
       <Filter>04. Etc\01. Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="CMyForm.cpp">
+      <Filter>04. Etc\02. Dialog\00. MyForm</Filter>
+    </ClCompile>
+    <ClCompile Include="CUnitTool.cpp">
+      <Filter>04. Etc\02. Dialog\02. UnitTool</Filter>
+    </ClCompile>
+    <ClCompile Include="CMiniView.cpp">
+      <Filter>04. Etc\02. Dialog\01. MiniView</Filter>
+    </ClCompile>
+    <ClCompile Include="CTransformInfo.cpp">
+      <Filter>04. Etc\02. Dialog\00. MyForm</Filter>
+    </ClCompile>
+    <ClCompile Include="CTextureListBox.cpp">
+      <Filter>04. Etc\02. Dialog\03. ListBox</Filter>
+    </ClCompile>
+    <ClCompile Include="CKeyManager.cpp">
+      <Filter>03. Manager\02. KeyManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CFindFolderTree.cpp">
+      <Filter>04. Etc\02. Dialog\04. FindFileDialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

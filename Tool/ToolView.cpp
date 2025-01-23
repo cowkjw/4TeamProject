@@ -14,24 +14,27 @@
 #include "ToolView.h"
 #include "CDevice.h"
 #include "CTextureMgr.h"
+#include "CTerrain.h"
 #include "MainFrm.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "CMiniView.h"
+#include "CKeyManager.h"
 
 HWND	g_hWnd;
 
 
 // CToolView
 
-IMPLEMENT_DYNCREATE(CToolView, CView)
+IMPLEMENT_DYNCREATE(CToolView, CScrollView)
 
-BEGIN_MESSAGE_MAP(CToolView, CView)
+BEGIN_MESSAGE_MAP(CToolView, CScrollView)
 	// 표준 인쇄 명령입니다.
-	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
+	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CScrollView::OnFilePrintPreview)
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEWHEEL()
@@ -55,10 +58,10 @@ CToolView::~CToolView()
 
 void CToolView::OnInitialUpdate()
 {
-	CView::OnInitialUpdate();
+	CScrollView::OnInitialUpdate();
 	m_nTimer = SetTimer(1, 16, NULL);
 	// AfxGetMainWnd : 현재 메인 윈도우의 값을 반환하는 전역함수
-
+	SetScrollSizes(MM_TEXT, CSize(TILECX * TILEX, TILECY * TILEY / 2));
 	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 
 	RECT rcWnd{};
@@ -123,6 +126,10 @@ void CToolView::OnInitialUpdate()
 	if (!m_pTerrain)
 	{
 		m_pTerrain = new CTerrain;
+		CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+		CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
+		m_pTerrain->Set_MainView(this);
+		m_pTerrain->Set_MiniView(pMiniView);
 		m_pTerrain->Initialize();
 	}
 
@@ -130,9 +137,14 @@ void CToolView::OnInitialUpdate()
 
 void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	CView::OnLButtonDown(nFlags, point);
+	CScrollView::OnLButtonDown(nFlags, point);
 
 	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+
+	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+	CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
+
+	pMiniView->Invalidate(FALSE);
 }
 
 
@@ -200,7 +212,7 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 void CToolView::OnDestroy()
 {
 	KillTimer(m_nTimer);
-	CView::OnDestroy();
+	CScrollView::OnDestroy();
 
 	//Safe_Delete(m_pSingle);
 
@@ -217,7 +229,7 @@ BOOL CToolView::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: CREATESTRUCT cs를 수정하여 여기에서
 	//  Window 클래스 또는 스타일을 수정합니다.
 
-	return CView::PreCreateWindow(cs);
+	return CScrollView::PreCreateWindow(cs);
 }
 
 // CToolView 인쇄
@@ -244,12 +256,12 @@ void CToolView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 #ifdef _DEBUG
 void CToolView::AssertValid() const
 {
-	CView::AssertValid();
+	CScrollView::AssertValid();
 }
 
 void CToolView::Dump(CDumpContext& dc) const
 {
-	CView::Dump(dc);
+	CScrollView::Dump(dc);
 }
 
 CToolDoc* CToolView::GetDocument() const // 디버그되지 않은 버전은 인라인으로 지정됩니다.
@@ -270,13 +282,13 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	if (zDelta > 0)
 	{
-		m_pTerrain->Change_DrawID(true);
+		m_pTerrain->Set_CameraZoom(true);
 	}
 	else
 	{
-		m_pTerrain->Change_DrawID(false);
+		m_pTerrain->Set_CameraZoom(false);
 	}
-	return CView::OnMouseWheel(nFlags, zDelta, pt);
+	return CScrollView::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 void CToolView::OnTimer(UINT_PTR nIDEvent)
@@ -287,11 +299,28 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 		if (m_pDevice)
 		{
 			m_pTerrain->Update();
+			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
+			{
+				m_pTerrain->Set_CameraOffsetX(-5.f);
+			}
+			if (CKeyManager::Get_Instance()->Key_Pressing('D'))
+			{
+				m_pTerrain->Set_CameraOffsetX(5.f);
+			}
+
+			if (CKeyManager::Get_Instance()->Key_Pressing('W'))
+			{
+				m_pTerrain->Set_CameraOffsetY(-5.f);
+			}
+			if (CKeyManager::Get_Instance()->Key_Pressing('S'))
+			{
+				m_pTerrain->Set_CameraOffsetY(5.f);
+			}
 
 			// 명시적 렌더링
 			Invalidate(FALSE);
 		}
 	}
 
-	CView::OnTimer(nIDEvent);
+	CScrollView::OnTimer(nIDEvent);
 }
