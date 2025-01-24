@@ -6,6 +6,7 @@
 #include "CTextureListBox.h"
 #include "CTextureMgr.h"
 #include "CFileInfo.h"
+#include "CJsonManager.h"
 
 
 // CTextureListBox
@@ -14,13 +15,15 @@ IMPLEMENT_DYNAMIC(CTextureListBox, CListBox)
 
 CTextureListBox::CTextureListBox()
 {
+    CJsonManager<map<int, wstring>>::Load_File(m_FilePathMap, "TestMap");
 }
 
 CTextureListBox::~CTextureListBox()
 {
+    CJsonManager<map<int, wstring>>::Save_File(m_FilePathMap, "TestMap");
 }
 
-void CTextureListBox::Load_TextureList(const CString& folderPath)
+void CTextureListBox::Load_TextureList(const wstring& folderPath)
 {
     if (GetCount() != 0)
     {
@@ -29,7 +32,7 @@ void CTextureListBox::Load_TextureList(const CString& folderPath)
 
     m_stCurFilePath = folderPath;
 	CFileFind finder;
-    BOOL bWorking = finder.FindFile(folderPath + _T("\\*.*"));
+    BOOL bWorking = finder.FindFile((folderPath + _T("\\*.*")).c_str());
     vector<pair<CString, CString>> files;
     while (bWorking)
     {

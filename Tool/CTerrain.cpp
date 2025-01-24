@@ -4,6 +4,7 @@
 #include "CDevice.h"
 #include <iostream>
 #include "CPerformanceTimer.h"
+#include "CJsonManager.h"
 
 CTerrain::CTerrain() :
 	m_bCanRender(false), m_pMainView(nullptr),m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
@@ -18,6 +19,7 @@ CTerrain::~CTerrain()
 
 void CTerrain::Initialize()
 {
+	D3DXCreateLine(CDevice::Get_Instance()->Get_Device(), &m_pLine);
 	m_bCanRender = true;
 	m_iChangeDrawId = 0;
 	m_dwContinuousTime = 2000ULL; // 2초
@@ -35,34 +37,41 @@ void CTerrain::Initialize()
 	//	}
 	//}
 // 화면 중앙 좌표
-	float centerX = WINCX * 0.5f;
-	float centerY = WINCY * 0.5f;
-
-	// 타일 개수 계산 (각 방향으로 퍼져나갈 타일 수)
-	int halfTilesX = (WINCX / TILECX) / 2;  // 한쪽 방향으로 퍼질 타일 수
-	int halfTilesY = (WINCY / TILEY) / 2;
-
-	// 중앙(0,0)에서 시작
-	float localX = 0.0f;
-	float localY = 0.0f;
-
-	// -halfTiles부터 +halfTiles까지 반복하여 4방향으로 타일 생성
-	for (int j = -halfTilesY; j <= halfTilesY; j++)
+	vector<TILE> vecTmpTile;
+	CJsonManager<vector<TILE>>::Load_File(vecTmpTile, "TILE_Info");
+	for (auto& tile : vecTmpTile)
 	{
-		for (int i = -halfTilesX-1; i <= halfTilesX; i++)
-		{
-			float fOffsetX = (j % 2 == 0) ? TILECX * 0.5f : 0.0f;
-
-			float posX = localX + (i * TILECX) + fOffsetX;
-			float posY = localY + (j * (TILECY * 0.5f));
-			float worldX = posX + centerX;
-			float worldY = posY + centerY;
-			m_vecTile.push_back(new TILE(
-				{ worldX , worldY, 0.f },  // 실제 화면에 그릴 때는 중앙점 더하기
-				0,
-				{ TILECX, TILECY }));
-		}
+		m_vecTile.push_back(new TILE(tile));
 	}
+	
+	//float centerX = WINCX * 0.5f;
+	//float centerY = WINCY * 0.5f;
+
+	//// 타일 개수 계산 (각 방향으로 퍼져나갈 타일 수)
+	//int halfTilesX = (WINCX / TILECX) / 2;  // 한쪽 방향으로 퍼질 타일 수
+	//int halfTilesY = (WINCY / TILEY) / 2;
+
+	//// 중앙(0,0)에서 시작
+	//float localX = 0.0f;
+	//float localY = 0.0f;
+
+	//// -halfTiles부터 +halfTiles까지 반복하여 4방향으로 타일 생성
+	//for (int j = -halfTilesY; j <= halfTilesY; j++)
+	//{
+	//	for (int i = -halfTilesX-1; i <= halfTilesX; i++)
+	//	{
+	//		float fOffsetX = (j % 2 == 0) ? TILECX * 0.5f : 0.0f;
+
+	//		float posX = localX + (i * TILECX) + fOffsetX;
+	//		float posY = localY + (j * (TILECY * 0.5f));
+	//		float worldX = posX + centerX;
+	//		float worldY = posY + centerY;
+	//		m_vecTile.push_back(new TILE(
+	//			{ worldX , worldY, 0.f },  // 실제 화면에 그릴 때는 중앙점 더하기
+	//			0,
+	//			{ TILECX, TILECY }));
+	//	}
+	//}
 
 	m_vecTileWorldMat.resize(m_vecTile.size());
 	for (int i = 0; i < (int)m_vecTileWorldMat.size(); i++)
@@ -228,10 +237,27 @@ void CTerrain::Render()
 	}
 #endif
 //	CDevice::Get_Instance()->Get_Sprite()->End();
+	//for (const auto& tile : m_vecTile) 
+	//{
+	//	RenderTileOutline(tile);
+	//}
+
+	DrawDiamondGrid();
 }
 
 void CTerrain::Release()
 {
+	if (m_pLine)
+	{
+		m_pLine->Release();
+		m_pLine = nullptr;
+	}
+	vector<TILE> vecTmpTiles;
+	for_each(m_vecTile.begin(), m_vecTile.end(), [&](const TILE* tile)
+		{
+			vecTmpTiles.push_back(*tile);
+		});
+	CJsonManager<vector<TILE>>::Save_File(vecTmpTiles, "TILE_Info");
 	for_each(m_vecTile.begin(), m_vecTile.end(), Safe_Delete<TILE*>);
 }
 
@@ -426,5 +452,94 @@ void CTerrain::Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY)
 	pOut._22 *= _fY;
 	pOut._32 *= _fY;
 	pOut._42 *= _fY;
+}
+
+void CTerrain::RenderTileOutline(const TILE* tile)
+{
+	CDevice::Get_Instance()->Get_Sprite()->End();
+	if (!m_pLine) return;
+
+	RECT rc{};
+	GetClientRect(m_pMainView->m_hWnd, &rc);
+	float fX = WINCX / float(rc.right - rc.left);
+	float fY = WINCY / float(rc.bottom - rc.top);
+
+	D3DXVECTOR2 vertices[5];
+	float screenCenterX = WINCX / 2.0f;
+	float screenCenterY = WINCY / 2.0f;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+
+	float halfWidth = (tile->vSize.x * 0.5f) * fCameraZoom * fX;
+	float halfHeight = (tile->vSize.y * 0.5f) * fCameraZoom * fY;
+
+	float posX = ((tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX) * fX;
+	float posY = ((tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY) * fY;
+
+	vertices[0] = D3DXVECTOR2(posX - halfWidth, posY);
+	vertices[1] = D3DXVECTOR2(posX, posY + halfHeight);
+	vertices[2] = D3DXVECTOR2(posX + halfWidth, posY);
+	vertices[3] = D3DXVECTOR2(posX, posY - halfHeight);
+	vertices[4] = vertices[0];
+
+	m_pLine->SetWidth(2.0f);
+	m_pLine->SetAntialias(TRUE);
+	m_pLine->SetGLLines(TRUE);
+	m_pLine->Begin();
+	m_pLine->Draw(vertices, 5, D3DCOLOR_ARGB(255, 0, 255, 0));
+	m_pLine->End();
+}
+
+void CTerrain::DrawDiamondGrid()
+{
+	CDevice::Get_Instance()->Get_Sprite()->End();
+	if (!m_pLine) return;
+
+	RECT rc{};
+	GetClientRect(m_pMainView->m_hWnd, &rc);
+	float fX = WINCX / float(rc.right - rc.left);
+	float fY = WINCY / float(rc.bottom - rc.top);
+
+	// Grid properties
+	float cellWidth = TILECX * fCameraZoom * fX;  // Adjust size as needed
+	float cellHeight = TILECY * fCameraZoom * fY; // Adjust size as needed
+
+	// Calculate grid coverage
+	int numRows = (WINCY / cellHeight) + 2;
+	int numCols = (WINCX / cellWidth) + 2;
+
+	// Calculate offset for camera movement
+	float screenCenterX = WINCX / 2.0f;
+	float screenCenterY = WINCY / 2.0f;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+
+	// Setup line properties
+	m_pLine->SetWidth(1.0f);
+	m_pLine->SetAntialias(TRUE);
+	m_pLine->SetGLLines(TRUE);
+
+	// Draw grid
+	m_pLine->Begin();
+
+	for (int row = -numRows; row < numRows; row++)
+	{
+		for (int col = -numCols; col < numCols; col++)
+		{
+			float baseX = ((col * TILECX) - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX;
+			float baseY = ((row * TILECY) - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY;
+
+			D3DXVECTOR2 vertices[5];
+			vertices[0] = D3DXVECTOR2(baseX, baseY);
+			vertices[1] = D3DXVECTOR2(baseX + cellWidth / 2, baseY + cellHeight / 2);
+			vertices[2] = D3DXVECTOR2(baseX + cellWidth, baseY);
+			vertices[3] = D3DXVECTOR2(baseX + cellWidth / 2, baseY - cellHeight / 2);
+			vertices[4] = vertices[0];
+
+			m_pLine->Draw(vertices, 5, D3DCOLOR_ARGB(128, 0, 255, 0));
+		}
+	}
+
+	m_pLine->End();
 }
 
