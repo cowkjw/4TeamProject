@@ -67,6 +67,9 @@
     <Filter Include="04. Etc\02. Dialog\04. FindFileDialog">
       <UniqueIdentifier>{a988b7ff-9cce-4fe3-8b37-14537d809d5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04. Etc\03. FileInfo">
+      <UniqueIdentifier>{9d9bcb3f-9cbf-4115-a407-a5b638eb607f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -135,6 +138,9 @@
     <ClInclude Include="CFindFolderTree.h">
       <Filter>04. Etc\02. Dialog\04. FindFileDialog</Filter>
     </ClInclude>
+    <ClInclude Include="CFileInfo.h">
+      <Filter>04. Etc\03. FileInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -190,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="CFindFolderTree.cpp">
       <Filter>04. Etc\02. Dialog\04. FindFileDialog</Filter>
+    </ClCompile>
+    <ClCompile Include="CFileInfo.cpp">
+      <Filter>04. Etc\03. FileInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

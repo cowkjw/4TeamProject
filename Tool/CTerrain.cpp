@@ -99,14 +99,7 @@ void CTerrain::Initialize()
 
 void CTerrain::Update()
 {
-	if (GetAsyncKeyState(VK_LEFT))
-		vCameraOffset.x += 10.0f;
-	if (GetAsyncKeyState(VK_RIGHT))
-		vCameraOffset.x -= 10.0f;
-	if (GetAsyncKeyState(VK_UP))
-		vCameraOffset.y += 10.0f;
-	if (GetAsyncKeyState(VK_DOWN))
-		vCameraOffset.y -= 10.0f;
+
 	float screenCenterX = WINCX / 2.0f;
 	float screenCenterY = WINCY / 2.0f;
 
@@ -263,7 +256,7 @@ void CTerrain::Mini_Render()
 		}
 		D3DXVECTOR3 vCenter(tile->vSize.x * 0.5f, tile->vSize.y * 0.5f, 0.f);
 		D3DXMatrixScaling(&matScale, 1.f, 1.f, 1.f);
-		D3DXMatrixTranslation(&matTrans, tile->vPos.x+(float)WINCX, tile->vPos.y+(float)WINCY, tile->vPos.z);
+		D3DXMatrixTranslation(&matTrans, tile->vPos.x+ (float)WINCX, tile->vPos.y+(float)WINCY, tile->vPos.z);
 		matWorld = matScale* matTrans;
 		Set_Ratio(matWorld, 0.3f, 0.3f);
 		RECT	rc{};

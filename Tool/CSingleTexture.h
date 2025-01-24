@@ -21,5 +21,11 @@ public:
 private:
 	TEXINFO*	m_pTexInfo;
 
+
+	// CTexture을(를) 통해 상속됨
+	const TEXINFO* Get_Texture2(const wstring& pStateKey, const wstring& FloderKey, const int iCnt) override;
+
+	HRESULT Insert_Texture2(const wstring& pFilePath, const wstring& pStateKey, const wstring& FloderKey, const int iCnt) override;
+
 };
 

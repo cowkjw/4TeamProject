@@ -54,4 +54,14 @@ void CSingleTexture::Release()
     Safe_Delete(m_pTexInfo);
 }
 
+const TEXINFO* CSingleTexture::Get_Texture2(const wstring& pStateKey, const wstring& FloderKey, const int iCnt)
+{
+    return nullptr;
+}
+
+HRESULT CSingleTexture::Insert_Texture2(const wstring& pFilePath, const wstring& pStateKey, const wstring& FloderKey, const int iCnt)
+{
+    return E_NOTIMPL;
+}
+
 

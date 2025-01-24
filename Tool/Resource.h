@@ -18,10 +18,9 @@
 #define IDC_STATIC_IMAGE                1010
 #define IDC_SPIN2                       1014
 #define IDC_EDIT4                       1015
-#define IDC_TREE1                       1015
 #define IDC_SPIN3                       1016
-#define IDC_MFCSHELLTREE1               1016
 #define IDC_EDIT5                       1017
+#define IDC_TREE1                       1017
 #define IDC_SPIN4                       1030
 #define IDC_EDIT6                       1031
 #define IDC_SPIN5                       1032
@@ -39,9 +38,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        316
+#define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           314
 #endif
 #endif

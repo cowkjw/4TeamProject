@@ -80,7 +80,7 @@ void CMyForm::OnLbnSelchangeList1()
 	{
 		CString strFileName;
 		m_TextureListBox.GetText(nIndex, strFileName);
-		strFileName = m_TextureListBox.Get_CurFilePath() +L"\\" + strFileName;
+		strFileName = m_TextureListBox.Get_FilePath(nIndex);// FilePath() +
 		CImage image;
 		if (image.Load(strFileName) == S_OK)
 		{
@@ -95,7 +95,7 @@ void CMyForm::OnLbnSelchangeList1()
 
 			CTerrain* pTerrain = pView->m_pTerrain;
 
-			pTerrain->Change_DrawID(nIndex);
+			//pTerrain->Change_DrawID(nIndex);
 
 		}
 	}

@@ -27,7 +27,7 @@ public:
 
 
 private:
-	map<wstring, CTexture*>		m_mapTex;
+	map<wstring, map<wstring, CTexture*>> m_mapTex;
 
 };
 

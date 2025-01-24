@@ -215,7 +215,7 @@ void CToolView::OnDestroy()
 	CScrollView::OnDestroy();
 
 	//Safe_Delete(m_pSingle);
-
+	CKeyManager::Destroy_Instance();
 	Safe_Delete(m_pTerrain);
 	CTextureMgr::Destroy_Instance();
 	m_pDevice->Destroy_Instance();
