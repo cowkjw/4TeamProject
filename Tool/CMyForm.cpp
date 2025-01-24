@@ -25,11 +25,11 @@ CMyForm::~CMyForm()
 
 void CMyForm::Change_ListBox()
 {
-	//if (nullptr == m_FindFolderTree.GetSafeHwnd())
-	//	m_FindFolderTree.Create(IDD_CFindFolderTree);	// 해당 id에 맞는 다이얼로그 생성
+	if (nullptr == m_FindFolderTree.GetSafeHwnd())
+		m_FindFolderTree.Create(IDD_CFindFolderTree);	// 해당 id에 맞는 다이얼로그 생성
 
-	//m_FindFolderTree.ShowWindow(SW_SHOW);
-	m_TextureListBox.Load_TextureListOfObjcet();
+	m_FindFolderTree.ShowWindow(SW_SHOW);
+//	m_TextureListBox.Load_TextureListOfObjcet();
 }
 
 void CMyForm::DoDataExchange(CDataExchange* pDX)

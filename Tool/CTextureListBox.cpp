@@ -5,6 +5,7 @@
 #include "Tool.h"
 #include "CTextureListBox.h"
 #include "CTextureMgr.h"
+#include "CFileInfo.h"
 
 
 // CTextureListBox
@@ -61,6 +62,7 @@ void CTextureListBox::Load_TextureList(const CString& folderPath)
     for (const auto& file : files)
     {
         int nIndex = AddString(file.first);
+        CString tmp = CFileInfo::Convert_RelativePath(file.second);
         m_FilePathMap[nIndex] = file.second;
     }
        // CTextureMgr::Get_Instance()->Insert_Texture(folderPath.GetString(), TEX_MULTI, L"Terrain", L"TILE", (int)files.size());
