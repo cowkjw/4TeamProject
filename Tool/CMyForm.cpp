@@ -100,7 +100,7 @@ void CMyForm::OnLbnSelchangeList1()
 
 			CTerrain* pTerrain = pView->m_pTerrain;
 			pTerrain->m_stTileFolderName = m_TextureListBox.m_stFolderName;
-			pTerrain->Change_DrawID(nIndex);
+			pTerrain->Change_DrawID(nIndex, m_TextureListBox.m_stFolderName);
 			}
 
 		}

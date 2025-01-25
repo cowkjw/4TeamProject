@@ -17,7 +17,7 @@ public:
 	void		Release();
 	void Mini_Render();
 	void Picking_Tile(const D3DXVECTOR3& mousePoint);
-	void Change_DrawID(int iDrawId);
+	void Change_DrawID(int iDrawId, const wstring& stChangeFolderName);
 	void	Set_MainView(CToolView* pMainView) { m_pMainView = pMainView; }
 	void	Set_MiniView(CMiniView* pMiniView) { m_pMiniView = pMiniView; }
 	void Set_CameraOffsetX(float deltaX) { vCameraOffset.x += deltaX; }
@@ -25,6 +25,7 @@ public:
 	void Set_CameraZoom(bool bUp) { fCameraZoom = bUp ? fCameraZoom += 0.1f : max(0.f, fCameraZoom - 0.1f); }
 public:
 	wstring m_stTileFolderName;
+	wstring m_stChangeFolderName;
 private:
 	void Render_Current_Draw_Tile();
 	void Set_Picking_DrawId(const int iDrawId) { m_iChangeDrawId = iDrawId; }

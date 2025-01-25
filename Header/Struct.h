@@ -28,6 +28,7 @@ typedef struct tagTile
 
 	UINT		byOption;			// 0, 1번(장애물)
 	UINT		byDrawID;			// 몇 번 타일 이미지
+	wstring    wstrStateKey;		// 타일 이미지의 상태키
 	bool bChange;
 
 	tagTile(): vPos(D3DXVECTOR3()),vSize(D3DXVECTOR2()), byOption(0),byDrawID(0), bChange(false){}
@@ -40,7 +41,8 @@ typedef struct tagTile
 			{"vSize", {t.vSize.x, t.vSize.y}},
 			{"byOption", t.byOption},
 			{"byDrawID", t.byDrawID},
-			{"bChange", t.bChange}
+			{"bChange", t.bChange},
+		    {"folder",t.wstrStateKey }
 		};
 	}
 
@@ -53,6 +55,7 @@ typedef struct tagTile
 		j.at("byOption").get_to(t.byOption);
 		j.at("byDrawID").get_to(t.byDrawID);
 		j.at("bChange").get_to(t.bChange);
+		j.at("folder").get_to(t.wstrStateKey);
 	}
 }TILE;
 

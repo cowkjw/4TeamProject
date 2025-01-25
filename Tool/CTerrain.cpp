@@ -42,6 +42,7 @@ void CTerrain::Initialize()
 			pTile->vSize = { (float)TILECX, (float)TILECY };
 			pTile->byOption = 0;
 			pTile->byDrawID = 5;
+			pTile->wstrStateKey = L"Act2";
 
 			m_vecTile.push_back(pTile);
 		}
@@ -111,7 +112,7 @@ void CTerrain::Render()
 
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", m_stTileFolderName, pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile->wstrStateKey, pTile->byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
@@ -175,7 +176,7 @@ void CTerrain::Mini_Render()
 
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", m_stTileFolderName, pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile->wstrStateKey, pTile->byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
@@ -231,16 +232,19 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 		if (bInner)
 		{
 			m_vecTile[i]->byDrawID = m_iChangeDrawId;
+			m_vecTile[i]->wstrStateKey = m_stChangeFolderName;
 			m_vecTile[i]->bChange = true;
 			break;
 		}
 	}
 }
 
-void CTerrain::Change_DrawID(int iDrawId)
+
+void CTerrain::Change_DrawID(int iDrawId, const wstring& stChangeFolderName)
 {
 	
 	m_bCanRender = true;
+	m_stChangeFolderName = stChangeFolderName;
 	m_dwDrawTileRenderTime = GetTickCount64();
 	Set_Picking_DrawId(iDrawId);
 }
