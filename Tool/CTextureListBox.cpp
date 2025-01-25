@@ -51,15 +51,21 @@ void CTextureListBox::Load_TextureList(const wstring& folderPath)
     }
     finder.Close();
 
-    sort(files.begin(), files.end(), [&](const pair<CString, CString>& p1,const pair<CString, CString>& p2)
+    sort(files.begin(), files.end(), [&](const pair<CString, CString>& p1,const pair<CString, CString>& p2){
+        wregex pattern(L"(?:_|^)(\\d+)");  // _뒤 또는 시작하는 숫자
+        wsmatch matches;
+        wstring str = p1.first.GetString();
+        wstring str2 = p2.first.GetString();
+        int a, b; 
+        if (regex_search(str, matches, pattern)) 
+        { 
+            a = _ttoi(matches[1].str().c_str());
+        }
+        if (regex_search(str2, matches, pattern))
         {
-            if (p1.first.Find(L"Tile") == 0)
-            {
-                CString num1 = p1.first.Mid(4);
-                CString num2 = p2.first.Mid(4);
-                return _ttoi(num1) < _ttoi(num2);
-            }
-            return p1.first < p2.first;
+            b= _ttoi(matches[1].str().c_str());
+        }
+        return a < b;
         });
     wstring tmpPath;
     for (const auto& file : files)
@@ -71,8 +77,8 @@ void CTextureListBox::Load_TextureList(const wstring& folderPath)
         }
         m_FilePathMap[nIndex] = file.second;
     }
-    tmpPath = regex_replace(tmpPath, wregex(L"\\d+"), L"%d");
- //   CTextureMgr::Get_Instance()->Insert_Texture(tmpPath, TEX_MULTI, L"Player", L"Attack", (int)files.size());
+    tmpPath = regex_replace(tmpPath, wregex(L"(.*\\\\.*?)(\\d+)([^\\\\]*$)"), L"$1%d$3");
+    CTextureMgr::Get_Instance()->Insert_Texture(tmpPath, TEX_MULTI,m_stCategory, m_stFolderName, (int)files.size());
 }
 
 void CTextureListBox::Load_TextureListOfObjcet(const CString& folderPath)

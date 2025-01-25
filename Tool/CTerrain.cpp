@@ -23,12 +23,12 @@ void CTerrain::Initialize()
 
 	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
 		L"../Texture/Stage/Terrain/Tile/Act2/Tile_%d.png",
-		TEX_MULTI, L"Terrain", L"Tile_Act2", 107)))
+		TEX_MULTI, L"Tile", L"Act2", 108)))
 	{
 		AfxMessageBox(L"Terrain Tile_Act2 Insert Failed");
 		return;
 	}
-
+	m_stTileFolderName = L"Act2";
 	for (int i = 0; i < TILEY; ++i)
 	{
 		for (int j = 0; j < TILEX; ++j)
@@ -111,7 +111,7 @@ void CTerrain::Render()
 
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Terrain", L"Tile_Act2", pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", m_stTileFolderName, pTile->byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
@@ -175,7 +175,7 @@ void CTerrain::Mini_Render()
 
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Terrain", L"Tile_Act2", pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", m_stTileFolderName, pTile->byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;

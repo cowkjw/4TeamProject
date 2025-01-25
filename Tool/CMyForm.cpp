@@ -81,7 +81,7 @@ void CMyForm::OnLbnSelchangeList1()
 	if (nIndex != LB_ERR)
 	{
 		wstring strFileName;
-		//m_TextureListBox.GetText(nIndex,strFileName.data());
+		wstring CurCategory = m_TextureListBox.m_stCategory;
 		strFileName = m_TextureListBox.Get_FilePath(nIndex);// FilePath() +
 		CImage image;
 		if (image.Load(strFileName.c_str()) == S_OK)
@@ -92,12 +92,16 @@ void CMyForm::OnLbnSelchangeList1()
 			resizedImage.ReleaseDC();
 			m_TextrueImage.SetBitmap((HBITMAP)resizedImage.Detach());
 
+			if (CurCategory == L"Tile")
+			{
+
 			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 			CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
 
 			CTerrain* pTerrain = pView->m_pTerrain;
-
-			//pTerrain->Change_DrawID(nIndex);
+			pTerrain->m_stTileFolderName = m_TextureListBox.m_stFolderName;
+			pTerrain->Change_DrawID(nIndex);
+			}
 
 		}
 	}

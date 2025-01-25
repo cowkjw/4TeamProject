@@ -26,12 +26,12 @@ typedef struct tagTile
 	D3DXVECTOR3	vPos;				// 타일의 중점 좌표
 	D3DXVECTOR2 vSize;				// 타일의 가로, 세로 사이즈
 
-	BYTE		byOption;			// 0, 1번(장애물)
-	BYTE		byDrawID;			// 몇 번 타일 이미지
+	UINT		byOption;			// 0, 1번(장애물)
+	UINT		byDrawID;			// 몇 번 타일 이미지
 	bool bChange;
 
 	tagTile(): vPos(D3DXVECTOR3()),vSize(D3DXVECTOR2()), byOption(0),byDrawID(0), bChange(false){}
-	tagTile(const D3DXVECTOR3& _vPos, BYTE _byDrawID, const D3DXVECTOR2& _vSize, BYTE _byOption = 0)
+	tagTile(const D3DXVECTOR3& _vPos, UINT _byDrawID, const D3DXVECTOR2& _vSize, UINT _byOption = 0)
 		: vPos(_vPos), byDrawID(_byDrawID), vSize(_vSize), byOption(_byOption), bChange(false){}
 
 	friend void to_json(json& j, const tagTile& t) {
