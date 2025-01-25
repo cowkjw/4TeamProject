@@ -28,13 +28,13 @@ HWND	g_hWnd;
 
 // CToolView
 
-IMPLEMENT_DYNCREATE(CToolView, CScrollView)
+IMPLEMENT_DYNCREATE(CToolView, CView)
 
-BEGIN_MESSAGE_MAP(CToolView, CScrollView)
+BEGIN_MESSAGE_MAP(CToolView, CView)
 	// 표준 인쇄 명령입니다.
-	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CScrollView::OnFilePrintPreview)
+	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
 	ON_WM_DESTROY()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEWHEEL()
@@ -58,10 +58,10 @@ CToolView::~CToolView()
 
 void CToolView::OnInitialUpdate()
 {
-	CScrollView::OnInitialUpdate();
+	CView::OnInitialUpdate();
 	m_nTimer = SetTimer(1, 16, NULL);
 	// AfxGetMainWnd : 현재 메인 윈도우의 값을 반환하는 전역함수
-	SetScrollSizes(MM_TEXT, CSize(TILECX * TILEX, TILECY * TILEY / 2));
+	
 	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 
 	RECT rcWnd{};
@@ -119,7 +119,7 @@ void CToolView::OnInitialUpdate()
 
 void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	CScrollView::OnLButtonDown(nFlags, point);
+	CView::OnLButtonDown(nFlags, point);
 
 	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
 
@@ -136,15 +136,6 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-
-	D3DXMATRIX	matWorld, matScale, matRotZ, matTrans;
-
-	D3DXMatrixIdentity(&matWorld);
-	D3DXMatrixScaling(&matScale, 1.f, 1.f, 1.f);
-	D3DXMatrixRotationZ(&matRotZ, D3DXToRadian(45.f));
-	D3DXMatrixTranslation(&matTrans, 0.f, 0.f, 0.f);
-
-	matWorld = matScale * matTrans;
 
 	m_pDevice->Render_Begin();
 
@@ -194,7 +185,7 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 void CToolView::OnDestroy()
 {
 	KillTimer(m_nTimer);
-	CScrollView::OnDestroy();
+	CView::OnDestroy();
 
 	//Safe_Delete(m_pSingle);
 	CKeyManager::Destroy_Instance();
@@ -211,7 +202,7 @@ BOOL CToolView::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: CREATESTRUCT cs를 수정하여 여기에서
 	//  Window 클래스 또는 스타일을 수정합니다.
 
-	return CScrollView::PreCreateWindow(cs);
+	return CView::PreCreateWindow(cs);
 }
 
 // CToolView 인쇄
@@ -238,12 +229,12 @@ void CToolView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 #ifdef _DEBUG
 void CToolView::AssertValid() const
 {
-	CScrollView::AssertValid();
+	CView::AssertValid();
 }
 
 void CToolView::Dump(CDumpContext& dc) const
 {
-	CScrollView::Dump(dc);
+	CView::Dump(dc);
 }
 
 CToolDoc* CToolView::GetDocument() const // 디버그되지 않은 버전은 인라인으로 지정됩니다.
@@ -270,7 +261,7 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	{
 		m_pTerrain->Set_CameraZoom(false);
 	}
-	return CScrollView::OnMouseWheel(nFlags, zDelta, pt);
+	return CView::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 void CToolView::OnTimer(UINT_PTR nIDEvent)
@@ -304,5 +295,5 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 		}
 	}
 
-	CScrollView::OnTimer(nIDEvent);
+	CView::OnTimer(nIDEvent);
 }
