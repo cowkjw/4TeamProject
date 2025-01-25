@@ -120,8 +120,8 @@ void CTerrain::Update()
 	float screenCenterY = WINCY / 2.0f;
 
 	// 줌 적용 시 화면 중앙 유지를 위한 오프셋 계산
-	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
-	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x + m_pMainView->GetScrollPos(0)) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y + m_pMainView->GetScrollPos(1)) * fCameraZoom;
 	for (int i = 0; i < (int)m_vecTile.size(); i++)
 	{
 		TILE* tile = m_vecTile[i];
@@ -136,13 +136,10 @@ void CTerrain::Update()
 		D3DXMatrixScaling(&matScale, fCameraZoom, fCameraZoom, 1.f);
 
 		// 타일 위치에 카메라 오프셋 적용
-		/*D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x + vCameraOffset.x- m_pMainView->GetScrollPos(0)) * fCameraZoom + zoomOffsetX,
-			(tile->vPos.y + vCameraOffset.y- m_pMainView->GetScrollPos(1)) * fCameraZoom + zoomOffsetY,
-			tile->vPos.z);*/
+
 		D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX,
-			(tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY,
+			(tile->vPos.x  * fCameraZoom) + zoomOffsetX,
+			(tile->vPos.y  * fCameraZoom) + zoomOffsetY,
 			tile->vPos.z);
 		matWorld = matScale * matTrans;
 		RECT	rc{};
@@ -474,14 +471,14 @@ void CTerrain::RenderTileOutline(const TILE* tile)
 	D3DXVECTOR2 vertices[5];
 	float screenCenterX = WINCX / 2.0f;
 	float screenCenterY = WINCY / 2.0f;
-	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
-	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x+ m_pMainView->GetScrollPos(0)) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y+ m_pMainView->GetScrollPos(1)) * fCameraZoom;
 
 	float halfWidth = (tile->vSize.x * 0.5f) * fCameraZoom * fX;
 	float halfHeight = (tile->vSize.y * 0.5f) * fCameraZoom * fY;
 
-	float posX = ((tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX) * fX;
-	float posY = ((tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY) * fY;
+	float posX = ((tile->vPos.x + zoomOffsetX) * fX);
+	float posY = ((tile->vPos.y + zoomOffsetY) * fY);
 
 	vertices[0] = D3DXVECTOR2(posX - halfWidth, posY);
 	vertices[1] = D3DXVECTOR2(posX, posY + halfHeight);
