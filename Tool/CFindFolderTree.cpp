@@ -55,12 +55,31 @@ void CFindFolderTree::AddFolderToTree(HTREEITEM hParent, const CString& folderPa
 	finder.Close();
 }
 
+void CFindFolderTree::DeleteTreeData(HTREEITEM hItem)
+{
+	if (!hItem) return;
+
+	CString* pStr = (CString*)m_treeCtrl.GetItemData(hItem);
+	delete pStr;
+
+	HTREEITEM hChild = m_treeCtrl.GetChildItem(hItem);
+	while (hChild) {
+		DeleteTreeData(hChild);
+		hChild = m_treeCtrl.GetNextSiblingItem(hChild);
+	}
+}
+
+void CFindFolderTree::PostNcDestroy()
+{
+}
+
 
 BEGIN_MESSAGE_MAP(CFindFolderTree, CDialog)
 
 	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE1, &CFindFolderTree::OnTvnSelchangedTree1)
 	//ON_NOTIFY(TVN_SELCHANGED, IDC_MFCSHELLTREE1, &CFindFolderTree::OnTvnSelchangedMfcshelltree1)
 	ON_BN_CLICKED(IDOK, &CFindFolderTree::OnBnClickedOk)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -97,11 +116,19 @@ void CFindFolderTree::OnTvnSelchangedTree1(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CFindFolderTree::OnBnClickedOk()
 {
-	if (m_relativePath.GetLength() != 0)
+	if (!m_relativePath.empty())
 	{
 		CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
 		pMyForm->m_TextureListBox.Load_TextureList(m_relativePath);
 	}
 	CDialog::OnOK();
+}
+
+
+void CFindFolderTree::OnDestroy()
+{
+	DeleteTreeData(m_treeCtrl.GetRootItem());
+	ShowWindow(SW_HIDE);
+	CDialog::OnDestroy();
 }

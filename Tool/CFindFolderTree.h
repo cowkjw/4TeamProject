@@ -20,12 +20,15 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	void AddFolderToTree(HTREEITEM hParent, const CString& folderPath);
+	void DeleteTreeData(HTREEITEM hItem);
+	virtual void PostNcDestroy();
 	DECLARE_MESSAGE_MAP()
 public:
 	CTreeCtrl m_treeCtrl;
 	CMFCShellTreeCtrl m_MFCTreeCtrl;
-	CString m_relativePath; // 파일 경로 선택한 곳 (상대 경로)
+	wstring m_relativePath; // 파일 경로 선택한 곳 (상대 경로)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTvnSelchangedTree1(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnDestroy();
 };

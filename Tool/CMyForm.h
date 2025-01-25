@@ -32,7 +32,6 @@ public:
 	void Change_ListBox();
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
-
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();

@@ -21,6 +21,7 @@ CMyForm::CMyForm()
 
 CMyForm::~CMyForm()
 {
+	OnDestroy();
 }
 
 void CMyForm::Change_ListBox()
@@ -38,6 +39,7 @@ void CMyForm::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_TextureListBox);
 	DDX_Control(pDX, IDC_STATIC_IMAGE, m_TextrueImage);
 }
+
 
 BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CMyForm::OnLbnSelchangeList1)
@@ -69,7 +71,7 @@ void CMyForm::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
 	SetScrollSizes(MM_TEXT, CSize(0, 0)); // 스크롤 없애기
-	m_TextureListBox.Load_TextureList();
+	//m_TextureListBox.Load_TextureList();
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
 }
 
@@ -78,11 +80,11 @@ void CMyForm::OnLbnSelchangeList1()
 	int nIndex = m_TextureListBox.GetCurSel();
 	if (nIndex != LB_ERR)
 	{
-		CString strFileName;
-		m_TextureListBox.GetText(nIndex, strFileName);
+		wstring strFileName;
+		//m_TextureListBox.GetText(nIndex,strFileName.data());
 		strFileName = m_TextureListBox.Get_FilePath(nIndex);// FilePath() +
 		CImage image;
-		if (image.Load(strFileName) == S_OK)
+		if (image.Load(strFileName.c_str()) == S_OK)
 		{
 			CImage resizedImage;
 			resizedImage.Create(200, 200, image.GetBPP()); // 원하는 크기 지정

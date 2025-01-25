@@ -6,6 +6,7 @@
 #include "CTextureListBox.h"
 #include "CTextureMgr.h"
 #include "CFileInfo.h"
+#include "CJsonManager.h"
 
 
 // CTextureListBox
@@ -20,16 +21,17 @@ CTextureListBox::~CTextureListBox()
 {
 }
 
-void CTextureListBox::Load_TextureList(const CString& folderPath)
+void CTextureListBox::Load_TextureList(const wstring& folderPath)
 {
     if (GetCount() != 0)
     {
         ResetContent();
+        m_FilePathMap.clear();
     }
 
     m_stCurFilePath = folderPath;
 	CFileFind finder;
-    BOOL bWorking = finder.FindFile(folderPath + _T("\\*.*"));
+    BOOL bWorking = finder.FindFile((folderPath + _T("\\*.*")).c_str());
     vector<pair<CString, CString>> files;
     while (bWorking)
     {
@@ -59,13 +61,18 @@ void CTextureListBox::Load_TextureList(const CString& folderPath)
             }
             return p1.first < p2.first;
         });
+    wstring tmpPath;
     for (const auto& file : files)
     {
         int nIndex = AddString(file.first);
-        CString tmp = CFileInfo::Convert_RelativePath(file.second);
+        if (tmpPath.empty())
+        {
+        tmpPath = CFileInfo::Convert_RelativePath(file.second);
+        }
         m_FilePathMap[nIndex] = file.second;
     }
-       // CTextureMgr::Get_Instance()->Insert_Texture(folderPath.GetString(), TEX_MULTI, L"Terrain", L"TILE", (int)files.size());
+    tmpPath = regex_replace(tmpPath, wregex(L"\\d+"), L"%d");
+ //   CTextureMgr::Get_Instance()->Insert_Texture(tmpPath, TEX_MULTI, L"Player", L"Attack", (int)files.size());
 }
 
 void CTextureListBox::Load_TextureListOfObjcet(const CString& folderPath)

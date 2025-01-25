@@ -118,6 +118,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../Header;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,6 +191,7 @@
     <ClInclude Include="CDevice.h" />
     <ClInclude Include="CFileInfo.h" />
     <ClInclude Include="CFindFolderTree.h" />
+    <ClInclude Include="CJsonManager.h" />
     <ClInclude Include="CKeyManager.h" />
     <ClInclude Include="CMiniView.h" />
     <ClInclude Include="CMultiTexture.h" />
@@ -215,6 +217,7 @@
     <ClCompile Include="CDevice.cpp" />
     <ClCompile Include="CFileInfo.cpp" />
     <ClCompile Include="CFindFolderTree.cpp" />
+    <ClCompile Include="CJsonManager.cpp" />
     <ClCompile Include="CKeyManager.cpp" />
     <ClCompile Include="CMiniView.cpp" />
     <ClCompile Include="CMultiTexture.cpp" />
@@ -241,6 +244,7 @@
     <ResourceCompile Include="Tool.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="res\Tool.rc2" />
   </ItemGroup>
   <ItemGroup>
@@ -250,5 +254,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\rapidjson.temprelease.0.0.2.20\build\native\rapidjson.temprelease.targets" Condition="Exists('..\packages\rapidjson.temprelease.0.0.2.20\build\native\rapidjson.temprelease.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\rapidjson.temprelease.0.0.2.20\build\native\rapidjson.temprelease.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\rapidjson.temprelease.0.0.2.20\build\native\rapidjson.temprelease.targets'))" />
+  </Target>
 </Project>
