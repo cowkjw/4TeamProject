@@ -78,6 +78,7 @@ void CTerrain::Initialize()
 
 void CTerrain::Update()
 {
+	
 
 }
 
@@ -191,103 +192,46 @@ void CTerrain::Mini_Render()
 
 void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 {
-	float screenCenterX = WINCX / 2.0f;
-	float screenCenterY = WINCY / 2.0f;
-
-	// 줌 적용 시 화면 중앙 유지를 위한 오프셋 계산
-	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
-	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
-	D3DXVECTOR3 adjustedMousePoint = {
-	   (mousePoint.x - zoomOffsetX) / fCameraZoom+vCameraOffset.x + m_pMainView->GetScrollPos(0),
-	   (mousePoint.y - zoomOffsetY) / fCameraZoom+ vCameraOffset.y +m_pMainView->GetScrollPos(1),
-	   mousePoint.z
-	};
-
-	for (auto& tile : m_vecTile)
+	for (size_t i = 0; i < TILEX * TILEY; ++i)
 	{
+		D3DXVECTOR3 vNewMouse{ 0.f, 0.f, 0.f };
+		vNewMouse.x = mousePoint.x / fCameraZoom + vCameraOffset.x;
+		vNewMouse.y = mousePoint.y / fCameraZoom + vCameraOffset.y;
+		
 		bool bInner = true;
 
 		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
+		
+		upPoint = { m_vecLine[i][0].x, m_vecLine[i][0].y, 0.f };
+		rightPoint = { m_vecLine[i][1].x, m_vecLine[i][1].y, 0.f };
+		bottomPoint = { m_vecLine[i][2].x, m_vecLine[i][2].y, 0.f };
+		leftPoint = { m_vecLine[i][3].x, m_vecLine[i][3].y, 0.f };
+		
+		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
+		vector<D3DXVECTOR3> vecCWPolyVec{	rightPoint - upPoint,
+											bottomPoint - rightPoint,
+											leftPoint - bottomPoint,
+											upPoint - leftPoint };
 
-		upPoint = { tile->vPos.x, tile->vPos.y + tile->vSize.y * 0.5f, 0.f };
-		bottomPoint = { tile->vPos.x, tile->vPos.y - tile->vSize.y * 0.5f,0.f };
-		rightPoint = { tile->vPos.x + tile->vSize.x * 0.5f, tile->vPos.y,0.f };
-		leftPoint = { tile->vPos.x - tile->vSize.x * 0.5f, tile->vPos.y ,0.f };
-
-		// 시계방향
-		//vector<D3DXVECTOR3> vecCWStartPoints{ leftPoint ,upPoint, rightPoint, bottomPoint };
-		//vector<D3DXVECTOR3> vecCWPolyVec{ upPoint - leftPoint,rightPoint - upPoint,bottomPoint - rightPoint,
-		//leftPoint - bottomPoint };		
-		//for (int i = 0; i < (int)vecCWStartPoints.size(); i++)
-		//{
-		//	D3DXVECTOR3 vMouse = mousePoint - vecCWStartPoints[i];
-		//	D3DXVECTOR3 tmp(-vecCWPolyVec[i].y, vecCWPolyVec[i].x, vecCWPolyVec[i].z); //안쪽으로 법선벡터를 뽑음
-
-		//	D3DXVec3Normalize(&vMouse, &vMouse);
-		//	D3DXVec3Normalize(&tmp, &tmp);
-		//	if (D3DXVec3Dot(&tmp, &vMouse) < 0.f)
-		//	{
-		//		bInner = false;
-		//		break;
-		//	}
-		//}
-		// 반시계 방향
-		vector<D3DXVECTOR3> vecCCWStartPoints{ upPoint,leftPoint,  bottomPoint,rightPoint };
-		vector<D3DXVECTOR3> vecCCWPolyVec{leftPoint-upPoint,bottomPoint - leftPoint,
-	 rightPoint - bottomPoint, upPoint-rightPoint };
-
-		for (int i = 0; i < (int)vecCCWStartPoints.size(); i++)
+		for (int i = 0; i < (int)vecCWStartPoints.size(); i++)
 		{
-			D3DXVECTOR3 vMouse = adjustedMousePoint - vecCCWStartPoints[i];
-			D3DXVECTOR3 tmp(-vecCCWPolyVec[i].y, vecCCWPolyVec[i].x, vecCCWPolyVec[i].z); // 반시계는 안쪽(왼쪽 회전)으로 법선 벡터를 구함
+			D3DXVECTOR3 vMouse = vNewMouse - vecCWStartPoints[i];
+			D3DXVECTOR3 tmp(-vecCWPolyVec[i].y, vecCWPolyVec[i].x, vecCWPolyVec[i].z);
 
 			D3DXVec3Normalize(&vMouse, &vMouse);
 			D3DXVec3Normalize(&tmp, &tmp);
-			if (D3DXVec3Dot(&tmp, &vMouse) < 0.f)
+
+			if (D3DXVec3Dot(&tmp, &vMouse) > 0.f)
 			{
 				bInner = false;
 				break;
 			}
 		}
 
-
-		//// 우상
-		//float a1 = (rightPoint.y - upPoint.y) / (rightPoint.x - upPoint.x);
-		//float b1 = upPoint.y - a1 * upPoint.x; // b = y - ax
-		//if (mousePoint.y < a1 * mousePoint.x + b1)
-		//{
-		//	continue;
-		//}
-
-		//// 좌상
-		//float a2 = (leftPoint.y - upPoint.y) / (leftPoint.x - upPoint.x);
-		//float b2 = upPoint.y - a2 * upPoint.x;
-		//if (mousePoint.y < a2 * mousePoint.x + b2)
-		//{
-
-		//	continue;
-		//}
-
-		//// 우하
-		//float a3 = (rightPoint.y - bottomPoint.y) / (rightPoint.x - bottomPoint.x);
-		//float b3 = bottomPoint.y - a3 * bottomPoint.x;
-		//if (mousePoint.y > a3 * mousePoint.x + b3)
-		//{
-		//	continue;
-		//}
-
-		//// 좌하
-		//float a4 = (leftPoint.y - bottomPoint.y) / (leftPoint.x - bottomPoint.x);
-		//float b4 = bottomPoint.y - a4 * bottomPoint.x;
-		//if (mousePoint.y > a4 * mousePoint.x + b4)
-		//{
-		//	continue;
-		//}
-
 		if (bInner)
 		{
-			tile->byDrawID = m_iChangeDrawId;
-			tile->bChange = true;
+			m_vecTile[i]->byDrawID = m_iChangeDrawId;
+			m_vecTile[i]->bChange = true;
 			break;
 		}
 	}
