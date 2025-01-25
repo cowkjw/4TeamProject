@@ -7,8 +7,8 @@
 #include "CJsonManager.h"
 
 CTerrain::CTerrain() :
-	m_bCanRender(false), m_pMainView(nullptr),m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
-	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f,0.f))
+	m_bCanRender(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
+	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f, 0.f))
 {
 }
 
@@ -29,7 +29,8 @@ void CTerrain::Initialize()
 		return;
 	}
 	m_stTileFolderName = L"Act2";
-	for (int i = 0; i < TILEY; ++i)
+
+	/*for (int i = 0; i < TILEY; ++i)
 	{
 		for (int j = 0; j < TILEX; ++j)
 		{
@@ -41,12 +42,12 @@ void CTerrain::Initialize()
 			pTile->vPos = { fX, fY, 0.f };
 			pTile->vSize = { (float)TILECX, (float)TILECY };
 			pTile->byOption = 0;
-			pTile->byDrawID = 5;
+			pTile->byDrawID = 0;
 			pTile->wstrStateKey = L"Act2";
 
 			m_vecTile.push_back(pTile);
 		}
-	}
+	}*/
 
 	for (int i = 0; i < TILEY; ++i)
 	{
@@ -137,7 +138,6 @@ void CTerrain::Render()
 		iIndex++;
 	}
 
-
 	DrawDiamondGrid();
 }
 
@@ -193,20 +193,20 @@ void CTerrain::Mini_Render()
 
 void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 {
-	for (size_t i = 0; i < TILEX * TILEY; ++i)
+	D3DXVECTOR3 vNewMouse{ 0.f, 0.f, 0.f };
+	vNewMouse.x = mousePoint.x / fCameraZoom + vCameraOffset.x;
+	vNewMouse.y = mousePoint.y / fCameraZoom + vCameraOffset.y;
+
+	for (auto& pTile : m_vecTile)
 	{
-		D3DXVECTOR3 vNewMouse{ 0.f, 0.f, 0.f };
-		vNewMouse.x = mousePoint.x / fCameraZoom + vCameraOffset.x;
-		vNewMouse.y = mousePoint.y / fCameraZoom + vCameraOffset.y;
-		
 		bool bInner = true;
 
 		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
 		
-		upPoint = { m_vecLine[i][0].x, m_vecLine[i][0].y, 0.f };
-		rightPoint = { m_vecLine[i][1].x, m_vecLine[i][1].y, 0.f };
-		bottomPoint = { m_vecLine[i][2].x, m_vecLine[i][2].y, 0.f };
-		leftPoint = { m_vecLine[i][3].x, m_vecLine[i][3].y, 0.f };
+		upPoint = { pTile->vPos.x, pTile->vPos.y + TILECY * 0.5f, 0.f };
+		rightPoint = { pTile->vPos.x + TILECX * 0.5f, pTile->vPos.y, 0.f };
+		bottomPoint = { pTile->vPos.x, pTile->vPos.y - TILECY * 0.5f, 0.f };
+		leftPoint = { pTile->vPos.x - TILECX * 0.5f, pTile->vPos.y, 0.f };
 		
 		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
 		vector<D3DXVECTOR3> vecCWPolyVec{	rightPoint - upPoint,
@@ -231,9 +231,56 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 
 		if (bInner)
 		{
-			m_vecTile[i]->byDrawID = m_iChangeDrawId;
-			m_vecTile[i]->wstrStateKey = m_stChangeFolderName;
-			m_vecTile[i]->bChange = true;
+			pTile->byDrawID = m_iChangeDrawId;
+			pTile->wstrStateKey = m_stChangeFolderName;
+			pTile->bChange = true;
+			return;
+		}
+	}
+
+	for (size_t i = 0; i < TILEX * TILEY; ++i)
+	{
+		bool bInner = true;
+
+		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
+
+		upPoint = { m_vecLine[i][0].x, m_vecLine[i][0].y, 0.f };
+		rightPoint = { m_vecLine[i][1].x, m_vecLine[i][1].y, 0.f };
+		bottomPoint = { m_vecLine[i][2].x, m_vecLine[i][2].y, 0.f };
+		leftPoint = { m_vecLine[i][3].x, m_vecLine[i][3].y, 0.f };
+
+		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
+		vector<D3DXVECTOR3> vecCWPolyVec{ rightPoint - upPoint,
+											bottomPoint - rightPoint,
+											leftPoint - bottomPoint,
+											upPoint - leftPoint };
+
+		for (int i = 0; i < (int)vecCWStartPoints.size(); i++)
+		{
+			D3DXVECTOR3 vMouse = vNewMouse - vecCWStartPoints[i];
+			D3DXVECTOR3 tmp(-vecCWPolyVec[i].y, vecCWPolyVec[i].x, vecCWPolyVec[i].z);
+
+			D3DXVec3Normalize(&vMouse, &vMouse);
+			D3DXVec3Normalize(&tmp, &tmp);
+
+			if (D3DXVec3Dot(&tmp, &vMouse) > 0.f)
+			{
+				bInner = false;
+				break;
+			}
+		}
+
+		if (bInner)
+		{
+			TILE* pNewTile = new TILE;
+
+			pNewTile->vPos = { m_vecLine[i][0].x, m_vecLine[i][0].y - TILECY * 0.5f, 0.f };
+			pNewTile->vSize = { (float)TILECX, (float)TILECY };
+			pNewTile->byOption = 0;
+			pNewTile->byDrawID = m_iChangeDrawId;
+			pNewTile->wstrStateKey = m_stChangeFolderName;
+
+			m_vecTile.push_back(pNewTile);
 			break;
 		}
 	}
@@ -336,6 +383,13 @@ void CTerrain::DrawDiamondGrid()
 	m_pLine->SetAntialias(TRUE); // ¾ÈÆ¼¾Ù¸®¾î½Ì Å°±â
 	m_pLine->SetGLLines(TRUE); 
 
+	RECT	rc{};
+
+	GetClientRect(m_pMainView->m_hWnd, &rc);
+
+	float	fX = WINCX / float(rc.right - rc.left);
+	float	fY = WINCY / float(rc.bottom - rc.top);
+
 	// Draw grid
 	m_pLine->Begin();
 
@@ -345,7 +399,8 @@ void CTerrain::DrawDiamondGrid()
 
 		for (int i = 0; i < arrLine.size(); ++i)
 		{
-			arrLine[i] = fCameraZoom * ( arrLine[i] - vCameraOffset);
+			arrLine[i].x = fX * fCameraZoom * ( arrLine[i].x - vCameraOffset.x);
+			arrLine[i].y = fY * fCameraZoom * ( arrLine[i].y - vCameraOffset.y);
 		}
 
 		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));
