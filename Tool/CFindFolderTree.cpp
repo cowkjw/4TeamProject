@@ -105,6 +105,10 @@ void CFindFolderTree::OnTvnSelchangedTree1(NMHDR* pNMHDR, LRESULT* pResult)
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem; // 새로 눌린거
 
 	CString* pFullPath = (CString*)m_treeCtrl.GetItemData(hItem);
+	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+	CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
+	pMyForm->m_TextureListBox.m_stCategory = m_treeCtrl.GetItemText(m_treeCtrl.GetParentItem(hItem));
+	pMyForm->m_TextureListBox.m_stFolderName = m_treeCtrl.GetItemText(hItem);
 	if (pFullPath)
 	{
 		m_relativePath = CFileInfo::Convert_RelativePath(*pFullPath);
@@ -121,6 +125,7 @@ void CFindFolderTree::OnBnClickedOk()
 		CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
 		pMyForm->m_TextureListBox.Load_TextureList(m_relativePath);
+		
 	}
 	CDialog::OnOK();
 }

@@ -18,8 +18,10 @@ public:
 	const wstring& Get_FilePath(int nIndex) { return m_FilePathMap[nIndex];}
 protected:
 	DECLARE_MESSAGE_MAP()
-private:
+public:
 	wstring m_stCurFilePath;
+	wstring m_stCategory;
+	wstring m_stFolderName;
 	map<int, wstring> m_FilePathMap;
 public:
 	afx_msg void OnDropFiles(HDROP hDropInfo);
