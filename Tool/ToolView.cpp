@@ -22,6 +22,7 @@
 #endif
 #include "CMiniView.h"
 #include "CKeyManager.h"
+#include "CMyForm.h"
 
 HWND	g_hWnd;
 
@@ -121,6 +122,14 @@ void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	CView::OnLButtonDown(nFlags, point);
 
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
+	if (nullptr != pMyForm)
+	{
+		if (0 == pMyForm->m_TextureListBox.GetCount())
+			return;
+	}
+	
 	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
 
 	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
