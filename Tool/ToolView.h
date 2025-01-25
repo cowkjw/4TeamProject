@@ -10,7 +10,7 @@
 class CTerrain;
 class CToolDoc;
 
-class CToolView : public CScrollView
+class CToolView : public CView
 {
 protected: // serialization에서만 만들어집니다.
 	CToolView() noexcept;

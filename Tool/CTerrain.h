@@ -32,6 +32,8 @@ private:
 	void DrawDiamondGrid();
 private:
 	vector<TILE*>		m_vecTile;
+	vector<array<D3DXVECTOR2, 5>>	m_vecLine;
+
 	vector<D3DXMATRIX> m_vecTileWorldMat;
 	vector<D3DXMATRIX> m_vecMiniTileWorldMat;
 	int m_iChangeDrawId;
