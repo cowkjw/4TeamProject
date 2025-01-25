@@ -53,6 +53,9 @@ public:
 	CDevice*	m_pDevice;
 	CTerrain* m_pTerrain;
 	UINT_PTR m_nTimer;
+	float m_fSrollSpeed;
+	float m_fAlpha; 
+	DWORD m_dwDisplayTime;
 	//CSingleTexture* m_pSingle;
 
 public:

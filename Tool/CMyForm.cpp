@@ -86,11 +86,12 @@ void CMyForm::OnLbnSelchangeList1()
 		CImage image;
 		if (image.Load(strFileName.c_str()) == S_OK)
 		{
-			CImage resizedImage;
-			resizedImage.Create(200, 200, image.GetBPP()); // 원하는 크기 지정
-			image.StretchBlt(resizedImage.GetDC(), 0, 0, 200, 200);
-			resizedImage.ReleaseDC();
-			m_TextrueImage.SetBitmap((HBITMAP)resizedImage.Detach());
+			CClientDC dc(&m_TextrueImage);
+			CRect rect;
+			m_TextrueImage.GetClientRect(&rect);
+
+			dc.FillSolidRect(rect, RGB(255, 255, 255));
+			image.Draw(dc, rect);
 
 			if (CurCategory == L"Tile")
 			{

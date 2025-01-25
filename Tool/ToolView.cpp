@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 // CToolView 생성/소멸
 
 CToolView::CToolView() noexcept
-	: m_pDevice(CDevice::Get_Instance()), m_pTerrain(nullptr)
+	: m_pDevice(CDevice::Get_Instance()), m_pTerrain(nullptr), m_nTimer(0), m_fSrollSpeed(0.f), m_fAlpha(0.f), m_dwDisplayTime(0)
 	//, m_pSingle(nullptr)
 
 {
@@ -117,6 +117,9 @@ void CToolView::OnInitialUpdate()
 		m_pTerrain->Initialize();
 	}
 
+	m_fSrollSpeed = 5.f;
+	m_fAlpha = 255.f;
+
 }
 
 void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
@@ -186,7 +189,28 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 	//	0,			// 정렬 기준(옵션)
 	//	D3DCOLOR_ARGB(255, 255, 255, 255));
 
+	CDevice::Get_Instance()->Get_Sprite()->Begin(D3DXSPRITE_ALPHABLEND);
+	TCHAR szSpeed[32];
+	float fDeltaTime = (GetTickCount() - m_dwDisplayTime) / 1000.0f;
+	m_fAlpha = max(0.0f, 255.0f - (fDeltaTime * 85.0f)); // 3초에 걸쳐 사라짐
 
+	// alpha값 적용
+	
+	RECT rc;
+	GetClientRect(&rc);
+	RECT textRect = { rc.right / 2 - 100, rc.bottom / 2 - 15, rc.right / 2 + 100, rc.bottom / 2 + 15 };
+	D3DXMATRIX matTrans;
+	D3DXMATRIX matScale;
+	D3DXMatrixScaling(&matScale, 10.f,10.f,5.f); // 폰트 크기 2배
+	D3DXMatrixTranslation(&matTrans, rc.right / 2.0f, rc.bottom / 2.0f, 0.f);
+	CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matTrans);
+	swprintf_s(szSpeed, L"Scroll Speed: %.1f", m_fSrollSpeed);
+	CDevice::Get_Instance()->Get_Font()->DrawTextW(CDevice::Get_Instance()->Get_Sprite(),
+		szSpeed,
+		lstrlen(szSpeed),
+		nullptr ,
+		DT_CENTER,
+		D3DCOLOR_ARGB((BYTE)m_fAlpha, 255, 255, 255));
 	m_pDevice->Render_End();
 
 
@@ -265,12 +289,31 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	if (zDelta > 0)
 	{
+		if (CKeyManager::Get_Instance()->Key_Pressing(VK_RBUTTON))
+		{
+			m_fSrollSpeed = min(15.f, m_fSrollSpeed + 0.5f);
+			m_dwDisplayTime = GetTickCount();
+		}
+		else
+		{
 		m_pTerrain->Set_CameraZoom(true);
+
+		}
 	}
 	else
 	{
+		if (CKeyManager::Get_Instance()->Key_Pressing(VK_RBUTTON))
+		{
+			m_fSrollSpeed = max(2.f, m_fSrollSpeed - 0.5f);
+			m_dwDisplayTime = GetTickCount();
+		}
+		else
+		{
+
 		m_pTerrain->Set_CameraZoom(false);
+		}
 	}
+
 	return CView::OnMouseWheel(nFlags, zDelta, pt);
 }
 
@@ -284,20 +327,20 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 			m_pTerrain->Update();
 			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
 			{
-				m_pTerrain->Set_CameraOffsetX(-5.f);
+				m_pTerrain->Set_CameraOffsetX(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('D'))
 			{
-				m_pTerrain->Set_CameraOffsetX(5.f);
+				m_pTerrain->Set_CameraOffsetX(m_fSrollSpeed);
 			}
 
 			if (CKeyManager::Get_Instance()->Key_Pressing('W'))
 			{
-				m_pTerrain->Set_CameraOffsetY(-5.f);
+				m_pTerrain->Set_CameraOffsetY(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('S'))
 			{
-				m_pTerrain->Set_CameraOffsetY(5.f);
+				m_pTerrain->Set_CameraOffsetY(m_fSrollSpeed);
 			}
 
 			// 명시적 렌더링
