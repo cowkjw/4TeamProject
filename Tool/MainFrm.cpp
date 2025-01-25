@@ -22,6 +22,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -98,7 +99,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 	// 미니맵
 	m_SecondSplitter.CreateView(0, 0, RUNTIME_CLASS(CMiniView), CSize(300, 300), pContext);
 	// 다이어로그
-	m_SecondSplitter.CreateView(1, 0, RUNTIME_CLASS(CMyForm), CSize(300, 300), pContext);
+	m_SecondSplitter.CreateView(1, 0, RUNTIME_CLASS(CMyForm), CSize(300, 100), pContext);
 	//SetColumnInfo(열 번호, 열의 크기 지정, 허용 가능한 최소크기)
 
 	m_ThirdSplitter.CreateStatic(&m_MainSplitter, 2, 1,
@@ -106,9 +107,33 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 		m_MainSplitter.IdFromRowCol(0, 1));
 
 	m_ThirdSplitter.CreateView(0, 0, RUNTIME_CLASS(CToolView), CSize(500, 300), pContext);
-	m_ThirdSplitter.CreateView(1, 0, RUNTIME_CLASS(CTransformInfo), CSize(500, 300), pContext);
+	m_ThirdSplitter.CreateView(1, 0, RUNTIME_CLASS(CTransformInfo), CSize(500, 100), pContext);
 	m_MainSplitter.SetColumnInfo(0, 400, 10); // 1열에 (왼쪽 창) 300을 기본으로 10까지만 줄일 수 있게
 	m_ThirdSplitter.SetRowInfo(0, 600, 10);
 	m_ThirdSplitter.SetRowInfo(1, 100, 10);
+
 	return TRUE;
+}
+
+
+void CMainFrame::OnSize(UINT nType, int cx, int cy)
+{
+	CFrameWnd::OnSize(nType, cx, cy);
+
+	if (m_MainSplitter.GetSafeHwnd() &&
+		m_SecondSplitter.GetSafeHwnd() &&
+		m_ThirdSplitter.GetSafeHwnd())
+	{
+		/*m_MainSplitter.SetRowInfo(0, cy, 10);
+		m_MainSplitter.SetColumnInfo(0, 400, 10);
+		m_MainSplitter.SetColumnInfo(1, cx - 400, 10);
+
+		m_SecondSplitter.SetRowInfo(0, 300, 10);
+		m_SecondSplitter.SetRowInfo(1, cy - 300, 10);
+
+		m_ThirdSplitter.SetRowInfo(0, (cy * 0.60), 10);
+		m_ThirdSplitter.SetRowInfo(1, (cy * 0.40), 10);
+
+		m_MainSplitter.RecalcLayout();*/
+	}
 }

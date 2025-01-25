@@ -86,7 +86,7 @@ END_MESSAGE_MAP()
 BOOL CFindFolderTree::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	CString path = _T("../Texture/");
+	CString path = _T("../Texture");
 	if (PathFileExists(path))
 	{
 		HTREEITEM hRoot = m_treeCtrl.InsertItem(path);
@@ -125,7 +125,6 @@ void CFindFolderTree::OnBnClickedOk()
 		CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
 		pMyForm->m_TextureListBox.Load_TextureList(m_relativePath);
-		
 	}
 	CDialog::OnOK();
 }

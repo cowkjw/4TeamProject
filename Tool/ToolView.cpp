@@ -40,6 +40,7 @@ BEGIN_MESSAGE_MAP(CToolView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_TIMER()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CToolView 생성/소멸
@@ -132,7 +133,7 @@ void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 	
 	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
 
-	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 	CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
 
 	pMiniView->Invalidate(FALSE);
@@ -305,4 +306,28 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CView::OnTimer(nIDEvent);
+}
+
+
+void CToolView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (CKeyManager::Get_Instance()->Key_Pressing(VK_LBUTTON))
+	{
+		CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+		CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));
+		if (nullptr != pMyForm)
+		{
+			if (0 == pMyForm->m_TextureListBox.GetCount())
+				return;
+		}
+
+		m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+
+		//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+		CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
+
+		pMiniView->Invalidate(FALSE);
+	}
+	CView::OnMouseMove(nFlags, point);
 }

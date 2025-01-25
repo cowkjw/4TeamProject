@@ -93,6 +93,8 @@ void CTerrain::Render()
 
 	for (auto pTile : m_vecTile)
 	{
+		if (pTile->wstrStateKey.empty())
+			continue;
 		D3DXMatrixIdentity(&matWorld);
 		D3DXMatrixScaling(&matScale, fCameraZoom, fCameraZoom, 1.f);
 		D3DXMatrixTranslation(&matTrans,
@@ -172,10 +174,17 @@ void CTerrain::Mini_Render()
 
 		matWorld = matScale * matTrans;
 
-		Set_Ratio(matWorld, 0.3f, 0.3f);
+		Set_Ratio(matWorld, 0.25f, 0.3f);
+		RECT	rc{};
+		GetClientRect(m_pMainView->m_hWnd, &rc);
 
+		float	fX = WINCX / float(rc.right - rc.left);
+		float	fY = WINCY / float(rc.bottom - rc.top);
+		float fScale = min(fX, fY);
+		Set_Ratio(matWorld, fScale, fScale);
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
-
+		if (pTile->wstrStateKey.empty())
+			continue;
 		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile->wstrStateKey, pTile->byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
