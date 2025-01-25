@@ -21,6 +21,7 @@ CMyForm::CMyForm()
 
 CMyForm::~CMyForm()
 {
+	OnDestroy();
 }
 
 void CMyForm::Change_ListBox()
@@ -38,6 +39,7 @@ void CMyForm::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_TextureListBox);
 	DDX_Control(pDX, IDC_STATIC_IMAGE, m_TextrueImage);
 }
+
 
 BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CMyForm::OnLbnSelchangeList1)
@@ -79,7 +81,7 @@ void CMyForm::OnLbnSelchangeList1()
 	if (nIndex != LB_ERR)
 	{
 		wstring strFileName;
-		m_TextureListBox.GetText(nIndex,strFileName.data());
+		//m_TextureListBox.GetText(nIndex,strFileName.data());
 		strFileName = m_TextureListBox.Get_FilePath(nIndex);// FilePath() +
 		CImage image;
 		if (image.Load(strFileName.c_str()) == S_OK)

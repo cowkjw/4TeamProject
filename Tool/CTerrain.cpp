@@ -19,6 +19,13 @@ CTerrain::~CTerrain()
 
 void CTerrain::Initialize()
 {
+	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
+		L"../Texture/Stage/Terrain/Tile/Tile%d.png",
+		TEX_MULTI, L"Terrain", L"Tile", 36)))
+	{
+		AfxMessageBox(L"Terrain Texture Insert Failed");
+		return;
+	}
 	D3DXCreateLine(CDevice::Get_Instance()->Get_Device(), &m_pLine);
 	m_bCanRender = true;
 	m_iChangeDrawId = 0;
@@ -37,41 +44,41 @@ void CTerrain::Initialize()
 	//	}
 	//}
 // 화면 중앙 좌표
-	vector<TILE> vecTmpTile;
-	CJsonManager<vector<TILE>>::Load_File(vecTmpTile, "TILE_Info");
-	for (auto& tile : vecTmpTile)
-	{
-		m_vecTile.push_back(new TILE(tile));
-	}
-	
-	//float centerX = WINCX * 0.5f;
-	//float centerY = WINCY * 0.5f;
-
-	//// 타일 개수 계산 (각 방향으로 퍼져나갈 타일 수)
-	//int halfTilesX = (WINCX / TILECX) / 2;  // 한쪽 방향으로 퍼질 타일 수
-	//int halfTilesY = (WINCY / TILEY) / 2;
-
-	//// 중앙(0,0)에서 시작
-	//float localX = 0.0f;
-	//float localY = 0.0f;
-
-	//// -halfTiles부터 +halfTiles까지 반복하여 4방향으로 타일 생성
-	//for (int j = -halfTilesY; j <= halfTilesY; j++)
+	//vector<TILE> vecTmpTile;
+	//CJsonManager<vector<TILE>>::Load_File(vecTmpTile, "TILE_Info");
+	//for (auto& tile : vecTmpTile)
 	//{
-	//	for (int i = -halfTilesX-1; i <= halfTilesX; i++)
-	//	{
-	//		float fOffsetX = (j % 2 == 0) ? TILECX * 0.5f : 0.0f;
-
-	//		float posX = localX + (i * TILECX) + fOffsetX;
-	//		float posY = localY + (j * (TILECY * 0.5f));
-	//		float worldX = posX + centerX;
-	//		float worldY = posY + centerY;
-	//		m_vecTile.push_back(new TILE(
-	//			{ worldX , worldY, 0.f },  // 실제 화면에 그릴 때는 중앙점 더하기
-	//			0,
-	//			{ TILECX, TILECY }));
-	//	}
+	//	m_vecTile.push_back(new TILE(tile));
 	//}
+	
+	float centerX = WINCX * 0.5f;
+	float centerY = WINCY * 0.5f;
+
+	// 타일 개수 계산 (각 방향으로 퍼져나갈 타일 수)
+	int halfTilesX = (WINCX / TILECX) / 2;  // 한쪽 방향으로 퍼질 타일 수
+	int halfTilesY = (WINCY / TILEY) / 2;
+
+	// 중앙(0,0)에서 시작
+	float localX = 0.0f;
+	float localY = 0.0f;
+
+	// -halfTiles부터 +halfTiles까지 반복하여 4방향으로 타일 생성
+	for (int j = -halfTilesY; j <= halfTilesY; j++)
+	{
+		for (int i = -halfTilesX-1; i <= halfTilesX; i++)
+		{
+			float fOffsetX = (j % 2 == 0) ? TILECX * 0.5f : 0.0f;
+
+			float posX = localX + (i * TILECX) + fOffsetX;
+			float posY = localY + (j * (TILECY * 0.5f));
+			float worldX = posX + centerX;
+			float worldY = posY + centerY;
+			m_vecTile.push_back(new TILE(
+				{ worldX , worldY, 0.f },  // 실제 화면에 그릴 때는 중앙점 더하기
+				0,
+				{ TILECX, TILECY }));
+		}
+	}
 
 	m_vecTileWorldMat.resize(m_vecTile.size());
 	for (int i = 0; i < (int)m_vecTileWorldMat.size(); i++)
@@ -113,8 +120,8 @@ void CTerrain::Update()
 	float screenCenterY = WINCY / 2.0f;
 
 	// 줌 적용 시 화면 중앙 유지를 위한 오프셋 계산
-	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
-	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x + m_pMainView->GetScrollPos(0)) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y + m_pMainView->GetScrollPos(1)) * fCameraZoom;
 	for (int i = 0; i < (int)m_vecTile.size(); i++)
 	{
 		TILE* tile = m_vecTile[i];
@@ -129,13 +136,10 @@ void CTerrain::Update()
 		D3DXMatrixScaling(&matScale, fCameraZoom, fCameraZoom, 1.f);
 
 		// 타일 위치에 카메라 오프셋 적용
-		/*D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x + vCameraOffset.x- m_pMainView->GetScrollPos(0)) * fCameraZoom + zoomOffsetX,
-			(tile->vPos.y + vCameraOffset.y- m_pMainView->GetScrollPos(1)) * fCameraZoom + zoomOffsetY,
-			tile->vPos.z);*/
+
 		D3DXMatrixTranslation(&matTrans,
-			(tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX,
-			(tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY,
+			(tile->vPos.x  * fCameraZoom) + zoomOffsetX,
+			(tile->vPos.y  * fCameraZoom) + zoomOffsetY,
 			tile->vPos.z);
 		matWorld = matScale * matTrans;
 		RECT	rc{};
@@ -153,7 +157,6 @@ void CTerrain::Update()
 
 void CTerrain::Render()
 {
-
 #ifdef _DEBUG
 	static CPerformanceTimer timer;
 	static int frameCount = 0;
@@ -242,6 +245,7 @@ void CTerrain::Render()
 	//	RenderTileOutline(tile);
 	//}
 
+
 	DrawDiamondGrid();
 }
 
@@ -252,12 +256,12 @@ void CTerrain::Release()
 		m_pLine->Release();
 		m_pLine = nullptr;
 	}
-	vector<TILE> vecTmpTiles;
-	for_each(m_vecTile.begin(), m_vecTile.end(), [&](const TILE* tile)
-		{
-			vecTmpTiles.push_back(*tile);
-		});
-	CJsonManager<vector<TILE>>::Save_File(vecTmpTiles, "TILE_Info");
+	//vector<TILE> vecTmpTiles;
+	//for_each(m_vecTile.begin(), m_vecTile.end(), [&](const TILE* tile)
+	//	{
+	//		vecTmpTiles.push_back(*tile);
+	//	});
+	//CJsonManager<vector<TILE>>::Save_File(vecTmpTiles, "TILE_Info");
 	for_each(m_vecTile.begin(), m_vecTile.end(), Safe_Delete<TILE*>);
 }
 
@@ -467,14 +471,14 @@ void CTerrain::RenderTileOutline(const TILE* tile)
 	D3DXVECTOR2 vertices[5];
 	float screenCenterX = WINCX / 2.0f;
 	float screenCenterY = WINCY / 2.0f;
-	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
-	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
+	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x+ m_pMainView->GetScrollPos(0)) * fCameraZoom;
+	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y+ m_pMainView->GetScrollPos(1)) * fCameraZoom;
 
 	float halfWidth = (tile->vSize.x * 0.5f) * fCameraZoom * fX;
 	float halfHeight = (tile->vSize.y * 0.5f) * fCameraZoom * fY;
 
-	float posX = ((tile->vPos.x - m_pMainView->GetScrollPos(0) - vCameraOffset.x) * fCameraZoom + zoomOffsetX) * fX;
-	float posY = ((tile->vPos.y - m_pMainView->GetScrollPos(1) - vCameraOffset.y) * fCameraZoom + zoomOffsetY) * fY;
+	float posX = ((tile->vPos.x + zoomOffsetX) * fX);
+	float posY = ((tile->vPos.y + zoomOffsetY) * fY);
 
 	vertices[0] = D3DXVECTOR2(posX - halfWidth, posY);
 	vertices[1] = D3DXVECTOR2(posX, posY + halfHeight);
@@ -514,10 +518,9 @@ void CTerrain::DrawDiamondGrid()
 	float zoomOffsetX = screenCenterX - (screenCenterX + vCameraOffset.x) * fCameraZoom;
 	float zoomOffsetY = screenCenterY - (screenCenterY + vCameraOffset.y) * fCameraZoom;
 
-	// Setup line properties
-	m_pLine->SetWidth(1.0f);
-	m_pLine->SetAntialias(TRUE);
-	m_pLine->SetGLLines(TRUE);
+	m_pLine->SetWidth(2.0f);
+	m_pLine->SetAntialias(TRUE); // 안티앨리어싱 키기
+	m_pLine->SetGLLines(TRUE); 
 
 	// Draw grid
 	m_pLine->Begin();
@@ -536,7 +539,7 @@ void CTerrain::DrawDiamondGrid()
 			vertices[3] = D3DXVECTOR2(baseX + cellWidth / 2, baseY - cellHeight / 2);
 			vertices[4] = vertices[0];
 
-			m_pLine->Draw(vertices, 5, D3DCOLOR_ARGB(128, 0, 255, 0));
+			m_pLine->Draw(vertices, 5, D3DCOLOR_ARGB(255, 0, 255, 0));
 		}
 	}
 

@@ -15,12 +15,10 @@ IMPLEMENT_DYNAMIC(CTextureListBox, CListBox)
 
 CTextureListBox::CTextureListBox()
 {
-    CJsonManager<map<int, wstring>>::Load_File(m_FilePathMap, "TestMap");
 }
 
 CTextureListBox::~CTextureListBox()
 {
-    CJsonManager<map<int, wstring>>::Save_File(m_FilePathMap, "TestMap");
 }
 
 void CTextureListBox::Load_TextureList(const wstring& folderPath)
@@ -28,6 +26,7 @@ void CTextureListBox::Load_TextureList(const wstring& folderPath)
     if (GetCount() != 0)
     {
         ResetContent();
+        m_FilePathMap.clear();
     }
 
     m_stCurFilePath = folderPath;
@@ -62,13 +61,18 @@ void CTextureListBox::Load_TextureList(const wstring& folderPath)
             }
             return p1.first < p2.first;
         });
+    wstring tmpPath;
     for (const auto& file : files)
     {
         int nIndex = AddString(file.first);
-        CString tmp = CFileInfo::Convert_RelativePath(file.second);
+        if (tmpPath.empty())
+        {
+        tmpPath = CFileInfo::Convert_RelativePath(file.second);
+        }
         m_FilePathMap[nIndex] = file.second;
     }
-       // CTextureMgr::Get_Instance()->Insert_Texture(folderPath.GetString(), TEX_MULTI, L"Terrain", L"TILE", (int)files.size());
+    tmpPath = regex_replace(tmpPath, wregex(L"\\d+"), L"%d");
+ //   CTextureMgr::Get_Instance()->Insert_Texture(tmpPath, TEX_MULTI, L"Player", L"Attack", (int)files.size());
 }
 
 void CTextureListBox::Load_TextureListOfObjcet(const CString& folderPath)

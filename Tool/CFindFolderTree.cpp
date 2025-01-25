@@ -55,12 +55,31 @@ void CFindFolderTree::AddFolderToTree(HTREEITEM hParent, const CString& folderPa
 	finder.Close();
 }
 
+void CFindFolderTree::DeleteTreeData(HTREEITEM hItem)
+{
+	if (!hItem) return;
+
+	CString* pStr = (CString*)m_treeCtrl.GetItemData(hItem);
+	delete pStr;
+
+	HTREEITEM hChild = m_treeCtrl.GetChildItem(hItem);
+	while (hChild) {
+		DeleteTreeData(hChild);
+		hChild = m_treeCtrl.GetNextSiblingItem(hChild);
+	}
+}
+
+void CFindFolderTree::PostNcDestroy()
+{
+}
+
 
 BEGIN_MESSAGE_MAP(CFindFolderTree, CDialog)
 
 	ON_NOTIFY(TVN_SELCHANGED, IDC_TREE1, &CFindFolderTree::OnTvnSelchangedTree1)
 	//ON_NOTIFY(TVN_SELCHANGED, IDC_MFCSHELLTREE1, &CFindFolderTree::OnTvnSelchangedMfcshelltree1)
 	ON_BN_CLICKED(IDOK, &CFindFolderTree::OnBnClickedOk)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -104,4 +123,12 @@ void CFindFolderTree::OnBnClickedOk()
 		pMyForm->m_TextureListBox.Load_TextureList(m_relativePath);
 	}
 	CDialog::OnOK();
+}
+
+
+void CFindFolderTree::OnDestroy()
+{
+	DeleteTreeData(m_treeCtrl.GetRootItem());
+	ShowWindow(SW_HIDE);
+	CDialog::OnDestroy();
 }
