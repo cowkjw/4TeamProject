@@ -28,6 +28,8 @@ private:
 	void Render_Current_Draw_Tile();
 	void Set_Picking_DrawId(const int iDrawId) { m_iChangeDrawId = iDrawId; }
 	void Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY);
+	void RenderTileOutline(const TILE* tile);
+	void DrawDiamondGrid();
 private:
 	vector<TILE*>		m_vecTile;
 	vector<D3DXMATRIX> m_vecTileWorldMat;
@@ -38,7 +40,7 @@ private:
 	DWORD64 m_dwContinuousTime;
 	CToolView* m_pMainView;
 	CMiniView* m_pMiniView;
-
+	LPD3DXLINE m_pLine;
 	float fCameraZoom = 1.0f;  // 줌 레벨 (1.0이 기본)
 	D3DXVECTOR2 vCameraOffset;
 };

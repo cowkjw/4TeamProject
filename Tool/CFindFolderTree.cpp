@@ -97,7 +97,7 @@ void CFindFolderTree::OnTvnSelchangedTree1(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CFindFolderTree::OnBnClickedOk()
 {
-	if (m_relativePath.GetLength() != 0)
+	if (!m_relativePath.empty())
 	{
 		CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMyForm* pMyForm = dynamic_cast<CMyForm*>(pMainFrm->m_SecondSplitter.GetPane(1, 0));

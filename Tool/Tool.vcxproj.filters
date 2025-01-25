@@ -70,6 +70,9 @@
     <Filter Include="04. Etc\03. FileInfo">
       <UniqueIdentifier>{9d9bcb3f-9cbf-4115-a407-a5b638eb607f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Manager\03. JsonManager">
+      <UniqueIdentifier>{ba1761bd-ac71-42cc-9c3f-95a4358a7e10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -141,6 +144,9 @@
     <ClInclude Include="CFileInfo.h">
       <Filter>04. Etc\03. FileInfo</Filter>
     </ClInclude>
+    <ClInclude Include="CJsonManager.h">
+      <Filter>03. Manager\03. JsonManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -200,6 +206,9 @@
     <ClCompile Include="CFileInfo.cpp">
       <Filter>04. Etc\03. FileInfo</Filter>
     </ClCompile>
+    <ClCompile Include="CJsonManager.cpp">
+      <Filter>03. Manager\03. JsonManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">
@@ -210,6 +219,7 @@
     <None Include="res\Tool.rc2">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ToolDoc.ico">

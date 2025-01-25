@@ -29,9 +29,31 @@ typedef struct tagTile
 	BYTE		byOption;			// 0, 1번(장애물)
 	BYTE		byDrawID;			// 몇 번 타일 이미지
 	bool bChange;
+
 	tagTile(): vPos(D3DXVECTOR3()),vSize(D3DXVECTOR2()), byOption(0),byDrawID(0), bChange(false){}
 	tagTile(const D3DXVECTOR3& _vPos, BYTE _byDrawID, const D3DXVECTOR2& _vSize, BYTE _byOption = 0)
 		: vPos(_vPos), byDrawID(_byDrawID), vSize(_vSize), byOption(_byOption), bChange(false){}
+
+	friend void to_json(json& j, const tagTile& t) {
+		j = json{
+			{"vPos", {t.vPos.x, t.vPos.y, t.vPos.z}},
+			{"vSize", {t.vSize.x, t.vSize.y}},
+			{"byOption", t.byOption},
+			{"byDrawID", t.byDrawID},
+			{"bChange", t.bChange}
+		};
+	}
+
+	friend void from_json(const json& j, tagTile& t) {
+		j.at("vPos").at(0).get_to(t.vPos.x);
+		j.at("vPos").at(1).get_to(t.vPos.y);
+		j.at("vPos").at(2).get_to(t.vPos.z);
+		j.at("vSize").at(0).get_to(t.vSize.x);
+		j.at("vSize").at(1).get_to(t.vSize.y);
+		j.at("byOption").get_to(t.byOption);
+		j.at("byDrawID").get_to(t.byDrawID);
+		j.at("bChange").get_to(t.bChange);
+	}
 }TILE;
 
 typedef	struct tagUnitData
@@ -60,5 +82,4 @@ typedef	struct tagFrame
 	float		fMax;	// 최대 이미지의 프레임 수
 
 }FRAME;
-
 
