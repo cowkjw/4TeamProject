@@ -15,7 +15,7 @@ public:
 	void Load_TextureListOfObjcet(const CString& folderPath = L"../Texture/Stage/Effect/ElectronicShock");
 	const auto& Get_CurFilePath() const { return m_stCurFilePath; }
 	void Set_CurFilePath(const wstring& filePath) { m_stCurFilePath = m_stCurFilePath; }
-	const auto& Get_FilePath(int nIndex) { return m_FilePathMap[nIndex]; }
+	const wstring& Get_FilePath(int nIndex) { return m_FilePathMap[nIndex];}
 protected:
 	DECLARE_MESSAGE_MAP()
 private:

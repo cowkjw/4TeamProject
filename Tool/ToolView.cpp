@@ -103,25 +103,7 @@ void CToolView::OnInitialUpdate()
 		return;
 	}
 
-	// m_pSingle = new CSingleTexture;
-	// 
-	// m_pSingle->Insert_Texture(L"../Texture/Cube.png");
 
-	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
-		L"../Texture/Cube.png",
-		TEX_SINGLE, L"Cube")))
-	{
-		AfxMessageBox(L"CubeTexture Insert Failed");
-		return;
-	}
-
-	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
-		L"../Texture/Stage/Terrain/Tile/Tile%d.png",
-		TEX_MULTI, L"Terrain", L"Tile", 36)))
-	{
-		AfxMessageBox(L"Terrain Texture Insert Failed");
-		return;
-	}
 
 	if (!m_pTerrain)
 	{
