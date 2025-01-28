@@ -29,8 +29,8 @@ private:
 	CFont		m_Font;
 public:
 	CUnitTool	m_UnitTool;
-	void SaveTileData(const vector<TILE*>& vecTile, const CString& FileName);
-	void LoadTileData(vector<TILE*>& vecTile, const CString& FileName);
+	void SaveTileData(vector<TILE>& vecTile, const CString& FileName);
+	void LoadTileData(vector<TILE>& vecTile, const CString& FileName);
 	void OnButtonObjectList();
 	void OnButtonTileList();
 protected:
