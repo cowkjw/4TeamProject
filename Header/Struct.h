@@ -67,7 +67,12 @@ typedef struct tagTile
 			ar << vPos.x << vPos.y << vPos.z;
 			ar << vSize.x << vSize.y;
 			ar << byOption << byDrawID;
-			ar << (wchar_t*)wstrStateKey.c_str();  // wide string 처리
+			int strLength = wstrStateKey.length(); // 문자열 길이 저장
+			ar << strLength;
+			for (wchar_t ch : wstrStateKey)
+			{
+				ar << ch;
+			}
 			ar << bChange;
 		}
 		else // 불러올 때
@@ -75,9 +80,16 @@ typedef struct tagTile
 			ar >> vPos.x >> vPos.y >> vPos.z;
 			ar >> vSize.x >> vSize.y;
 			ar >> byOption >> byDrawID;
-			CString tempStr;  // CString을 사용하여 상태키를 읽음
-			ar >> tempStr;
-			wstrStateKey = tempStr.GetString();  // CString을 wstring으로 변환
+			// wstrStateKey 문자열 처리
+			int strLength = 0;
+			ar >> strLength; // 문자열 길이 읽기
+			wstrStateKey.clear();
+			for (int i = 0; i < strLength; ++i)
+			{
+				wchar_t ch;
+				ar >> ch;
+				wstrStateKey.push_back(ch);
+			}
 			ar >> bChange;
 		}
 	}

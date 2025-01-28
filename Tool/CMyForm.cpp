@@ -129,7 +129,7 @@ void CMyForm::OnBnClickedButton3()
 
 	CTerrain* pTerrain = pView->m_pTerrain;
 
-	SaveTileData(pTerrain->m_vecTile, _T("../Data/tileDate.dat"));
+	SaveTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
 }
 
 //Load 버튼
@@ -140,26 +140,27 @@ void CMyForm::OnBnClickedButton4()
 
 	CTerrain* pTerrain = pView->m_pTerrain;
 
-	LoadTileData(pTerrain->m_vecTile, _T("../Data/tileDate.dat"));
+	LoadTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
 }
 
-void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& FileName)
+void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName)
 {
-	CString strPath = FileName.Left(FileName.ReverseFind('\\'));
-
-	// 경로가 존재하는지 확인
-	if (!PathFileExists(FileName))
+	// 폴더 경로 확인 및 생성
+	if (!PathFileExists(strFolderPath))
 	{
-		// 경로가 없다면 생성
-		if (!CreateDirectory(FileName, NULL))
+		if (!CreateDirectory(strFolderPath, NULL))
 		{
 			AfxMessageBox(_T("폴더 생성에 실패했습니다."));
 			return;
 		}
 	}
 
+	// 전체 경로 생성
+	CString strFullPath;
+	strFullPath.Format(_T("%s\\%s"), strFolderPath, strFileName);
+
 	CFile File;
-	if (!File.Open(FileName, CFile::modeCreate | CFile::modeWrite))
+	if (!File.Open(strFullPath, CFile::modeCreate | CFile::modeWrite))
 	{
 		AfxMessageBox(_T("파일을 생성할 수 없습니다."));
 		return;
@@ -167,34 +168,48 @@ void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& FileName)
 
 	CArchive Ar(&File, CArchive::store);
 	int iTileCount = vecTile.size();
-
 	Ar << iTileCount;
-
 	for (int i = 0; i < iTileCount; ++i)
 	{
 		vecTile[i].Serialize(Ar);
 	}
-
 	Ar.Close();
 	File.Close();
 }
 
-void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& FileName)
+void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName)
 {
-	CFile File(FileName, CFile::modeRead);
+	// 전체 경로 생성
+	CString strFullPath;
+	strFullPath.Format(_T("%s\\%s"), strFolderPath, strFileName);
+
+	// 폴더 경로 확인
+	if (!PathFileExists(strFolderPath))
+	{
+		AfxMessageBox(_T("파일이 없습니다."));
+		return;
+	}
+
+	CFile File;
+
+	if (!File.Open(strFullPath, CFile::modeRead))
+	{
+		AfxMessageBox(_T("파일을 생성할 수 없습니다."));
+		return;
+	}
+
 	CArchive Ar(&File, CArchive::load);
 
-	int iTileCount;
-	Ar >> iTileCount; // 타일의 개수를 불러오기
+	int iTileCount = 0;
 
+	Ar >> iTileCount;
+	vecTile.clear();
 	vecTile.resize(iTileCount);
 
 	for (int i = 0; i < iTileCount; ++i)
 	{
 		vecTile[i].Serialize(Ar);
 	}
-
 	Ar.Close();
 	File.Close();
 }
-
