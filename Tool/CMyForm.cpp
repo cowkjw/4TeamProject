@@ -124,34 +124,62 @@ void CMyForm::OnLbnSelchangeList1()
 //Save 버튼
 void CMyForm::OnBnClickedButton3()
 {
-	//SaveTileData(, _T("tileDate.dat"));
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
+
+	CTerrain* pTerrain = pView->m_pTerrain;
+
+	SaveTileData(pTerrain->m_vecTile, _T("../Data/tileDate.dat"));
 }
 
 //Load 버튼
 void CMyForm::OnBnClickedButton4()
 {
-	vector<TILE*> vecLoadTile;
-	LoadTileData(vecLoadTile, _T("tileDate.dat"));
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
+
+	CTerrain* pTerrain = pView->m_pTerrain;
+
+	LoadTileData(pTerrain->m_vecTile, _T("../Data/tileDate.dat"));
 }
 
-void CMyForm::SaveTileData(const vector<TILE*>& vecTile, const CString& FileName)
+void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& FileName)
 {
-	CFile File(FileName, CFile::modeCreate | CFile::modeWrite);
-	CArchive Ar(&File, CArchive::store);
+	CString strPath = FileName.Left(FileName.ReverseFind('\\'));
 
+	// 경로가 존재하는지 확인
+	if (!PathFileExists(FileName))
+	{
+		// 경로가 없다면 생성
+		if (!CreateDirectory(FileName, NULL))
+		{
+			AfxMessageBox(_T("폴더 생성에 실패했습니다."));
+			return;
+		}
+	}
+
+	CFile File;
+	if (!File.Open(FileName, CFile::modeCreate | CFile::modeWrite))
+	{
+		AfxMessageBox(_T("파일을 생성할 수 없습니다."));
+		return;
+	}
+
+	CArchive Ar(&File, CArchive::store);
 	int iTileCount = vecTile.size();
-	Ar << iTileCount; // 타일의 개수를 저장
+
+	Ar << iTileCount;
 
 	for (int i = 0; i < iTileCount; ++i)
 	{
-		vecTile[i]->Serialize(Ar);
+		vecTile[i].Serialize(Ar);
 	}
 
 	Ar.Close();
 	File.Close();
 }
 
-void CMyForm::LoadTileData(vector<TILE*>& vecTile, const CString& FileName)
+void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& FileName)
 {
 	CFile File(FileName, CFile::modeRead);
 	CArchive Ar(&File, CArchive::load);
@@ -163,7 +191,7 @@ void CMyForm::LoadTileData(vector<TILE*>& vecTile, const CString& FileName)
 
 	for (int i = 0; i < iTileCount; ++i)
 	{
-		vecTile[i]->Serialize(Ar);
+		vecTile[i].Serialize(Ar);
 	}
 
 	Ar.Close();
