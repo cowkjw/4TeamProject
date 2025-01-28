@@ -53,10 +53,10 @@ void CMyForm::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CMyForm::OnLbnSelchangeList1)
-	ON_BN_CLICKED(IDC_BUTTON5, &CMyForm::OnBnClickedButton4)
-	ON_BN_CLICKED(IDC_BUTTON4, &CMyForm::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMyForm::OnButtonObjectList)
-	ON_BN_CLICKED(IDC_BUTTON3, &CMyForm::OnButtonTileList)
+	ON_BN_CLICKED(IDC_BUTTON5, &CMyForm::OnButtonTileList)
+	ON_BN_CLICKED(IDC_BUTTON3, &CMyForm::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON4, &CMyForm::OnBnClickedButton4)
 END_MESSAGE_MAP()
 
 
@@ -124,7 +124,7 @@ void CMyForm::OnLbnSelchangeList1()
 //Save 버튼
 void CMyForm::OnBnClickedButton3()
 {
-	SaveTileData(, _T("tileDate.dat"));
+	//SaveTileData(, _T("tileDate.dat"));
 }
 
 //Load 버튼
@@ -132,8 +132,6 @@ void CMyForm::OnBnClickedButton4()
 {
 	vector<TILE*> vecLoadTile;
 	LoadTileData(vecLoadTile, _T("tileDate.dat"));
-
-
 }
 
 void CMyForm::SaveTileData(const vector<TILE*>& vecTile, const CString& FileName)

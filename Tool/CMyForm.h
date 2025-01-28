@@ -2,6 +2,7 @@
 #include "CUnitTool.h"
 #include "CTextureListBox.h"
 #include "CFindFolderTree.h"
+#include "Include.h"
 
 
 // CMyForm 폼 보기
