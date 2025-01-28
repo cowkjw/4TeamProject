@@ -4,7 +4,6 @@
 #include "CFindFolderTree.h"
 
 
-
 // CMyForm 폼 보기
 
 class CMyForm : public CFormView
@@ -30,6 +29,9 @@ private:
 public:
 	CUnitTool	m_UnitTool;
 	void Change_ListBox();
+	void SaveTileData(const vector<TILE*>& vecTile, const CString& FileName);
+	void LoadTileData(vector<TILE*>& vecTile, const CString& FileName);
+	
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	DECLARE_MESSAGE_MAP()
@@ -41,6 +43,8 @@ public:
 	CFindFolderTree m_FindFolderTree;
 	CStatic m_TextrueImage;
 
+	afx_msg void OnBnClickedButton4();
+	afx_msg void OnBnClickedButton3();
 };
 
 
