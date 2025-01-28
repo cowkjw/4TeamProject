@@ -203,6 +203,7 @@
     <ClInclude Include="CTextureListBox.h" />
     <ClInclude Include="CTextureMgr.h" />
     <ClInclude Include="CTransformInfo.h" />
+    <ClInclude Include="CUndoManager.h" />
     <ClInclude Include="CUnitTool.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="CTextureListBox.cpp" />
     <ClCompile Include="CTextureMgr.cpp" />
     <ClCompile Include="CTransformInfo.cpp" />
+    <ClCompile Include="CUndoManager.cpp" />
     <ClCompile Include="CUnitTool.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">

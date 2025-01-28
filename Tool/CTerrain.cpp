@@ -5,9 +5,11 @@
 #include <iostream>
 #include "CPerformanceTimer.h"
 #include "CJsonManager.h"
+#include "CUndoManager.h"
+#include "CKeyManager.h"
 
 CTerrain::CTerrain() :
-	m_bCanRender(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
+	m_bCanRender(false), m_pLine(nullptr), m_bIsPicking(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
 	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f, 0.f))
 {
 }
@@ -73,7 +75,7 @@ void CTerrain::Initialize()
 				vPos[2],
 				vPos[3],
 				vPos[4]
-			});
+				});
 		}
 	}
 }
@@ -91,16 +93,16 @@ void CTerrain::Render()
 	TCHAR	szBuf[MIN_STR] = L"";
 	int		iIndex(0);
 
-	for (auto pTile : m_vecTile)
+	for (const auto& pTile : m_vecTile)
 	{
-		if (pTile->wstrStateKey.empty())
+		if (pTile.wstrStateKey.empty())
 			continue;
 		D3DXMatrixIdentity(&matWorld);
 		D3DXMatrixScaling(&matScale, fCameraZoom, fCameraZoom, 1.f);
 		D3DXMatrixTranslation(&matTrans,
-			(pTile->vPos.x - vCameraOffset.x) * fCameraZoom,
-			(pTile->vPos.y - vCameraOffset.y) * fCameraZoom,
-			pTile->vPos.z);
+			(pTile.vPos.x - vCameraOffset.x) * fCameraZoom,
+			(pTile.vPos.y - vCameraOffset.y) * fCameraZoom,
+			pTile.vPos.z);
 
 		matWorld = matScale * matTrans;
 
@@ -115,7 +117,7 @@ void CTerrain::Render()
 
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile->wstrStateKey, pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile.wstrStateKey, pTile.byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
@@ -156,21 +158,24 @@ void CTerrain::Release()
 	//		vecTmpTiles.push_back(*tile);
 	//	});
 	//CJsonManager<vector<TILE>>::Save_File(vecTmpTiles, "TILE_Info");
-	for_each(m_vecTile.begin(), m_vecTile.end(), Safe_Delete<TILE*>);
+	//for_each(m_vecTile.begin(), m_vecTile.end(), Safe_Delete<TILE*>);
+	m_vecTile.clear();
 }
 
 void CTerrain::Mini_Render()
-{ 
+{
 	D3DXMATRIX	matWorld, matScale, matTrans;
 
-	for (auto pTile : m_vecTile)
+	for (const auto& pTile : m_vecTile)
 	{
+		if (pTile.wstrStateKey.empty())
+			continue;
 		D3DXMatrixIdentity(&matWorld);
 		D3DXMatrixScaling(&matScale, 1.f, 1.f, 1.f);
 		D3DXMatrixTranslation(&matTrans,
-			pTile->vPos.x,
-			pTile->vPos.y,
-			pTile->vPos.z);
+			pTile.vPos.x,
+			pTile.vPos.y,
+			pTile.vPos.z);
 
 		matWorld = matScale * matTrans;
 
@@ -183,9 +188,9 @@ void CTerrain::Mini_Render()
 		float fScale = min(fX, fY);
 		Set_Ratio(matWorld, fScale, fScale);
 		CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
-		if (pTile->wstrStateKey.empty())
+		if (pTile.wstrStateKey.empty())
 			continue;
-		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile->wstrStateKey, pTile->byDrawID);
+		const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Tile", pTile.wstrStateKey, pTile.byDrawID);
 
 		float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
 		float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
@@ -202,6 +207,10 @@ void CTerrain::Mini_Render()
 
 void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 {
+	if (!m_bIsPicking)
+	{
+		CUndoManager::Get_Instance()->SaveState(UndoType::TILE);
+	}
 	D3DXVECTOR3 vNewMouse{ 0.f, 0.f, 0.f };
 	vNewMouse.x = mousePoint.x / fCameraZoom + vCameraOffset.x;
 	vNewMouse.y = mousePoint.y / fCameraZoom + vCameraOffset.y;
@@ -211,14 +220,14 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 		bool bInner = true;
 
 		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
-		
-		upPoint = { pTile->vPos.x, pTile->vPos.y + TILECY * 0.5f, 0.f };
-		rightPoint = { pTile->vPos.x + TILECX * 0.5f, pTile->vPos.y, 0.f };
-		bottomPoint = { pTile->vPos.x, pTile->vPos.y - TILECY * 0.5f, 0.f };
-		leftPoint = { pTile->vPos.x - TILECX * 0.5f, pTile->vPos.y, 0.f };
-		
+
+		upPoint = { pTile.vPos.x, pTile.vPos.y + TILECY * 0.5f, 0.f };
+		rightPoint = { pTile.vPos.x + TILECX * 0.5f, pTile.vPos.y, 0.f };
+		bottomPoint = { pTile.vPos.x, pTile.vPos.y - TILECY * 0.5f, 0.f };
+		leftPoint = { pTile.vPos.x - TILECX * 0.5f, pTile.vPos.y, 0.f };
+
 		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
-		vector<D3DXVECTOR3> vecCWPolyVec{	rightPoint - upPoint,
+		vector<D3DXVECTOR3> vecCWPolyVec{ rightPoint - upPoint,
 											bottomPoint - rightPoint,
 											leftPoint - bottomPoint,
 											upPoint - leftPoint };
@@ -240,9 +249,10 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 
 		if (bInner)
 		{
-			pTile->byDrawID = m_iChangeDrawId;
-			pTile->wstrStateKey = m_stChangeFolderName;
-			pTile->bChange = true;
+			pTile.byDrawID = m_iChangeDrawId;
+			pTile.wstrStateKey = m_stChangeFolderName;
+			pTile.bChange = true;
+			m_bIsPicking = true;
 			return;
 		}
 	}
@@ -281,15 +291,16 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 
 		if (bInner)
 		{
-			TILE* pNewTile = new TILE;
+			TILE newTile(
+				{ m_vecLine[i][0].x, m_vecLine[i][0].y - TILECY * 0.5f, 0.f },  // vPos (1번)
+				m_iChangeDrawId,                                                  // byDrawID (2번)
+				{ (float)TILECX, (float)TILECY },                                // vSize (3번)
+				m_stChangeFolderName,                                            // strStateKey (4번)
+				0                                                                // byOption (5번)
+			);
 
-			pNewTile->vPos = { m_vecLine[i][0].x, m_vecLine[i][0].y - TILECY * 0.5f, 0.f };
-			pNewTile->vSize = { (float)TILECX, (float)TILECY };
-			pNewTile->byOption = 0;
-			pNewTile->byDrawID = m_iChangeDrawId;
-			pNewTile->wstrStateKey = m_stChangeFolderName;
-
-			m_vecTile.push_back(pNewTile);
+			m_vecTile.push_back(newTile);
+			m_bIsPicking = true;
 			break;
 		}
 	}
@@ -298,11 +309,19 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 
 void CTerrain::Change_DrawID(int iDrawId, const wstring& stChangeFolderName)
 {
-	
+
 	m_bCanRender = true;
 	m_stChangeFolderName = stChangeFolderName;
 	m_dwDrawTileRenderTime = GetTickCount64();
 	Set_Picking_DrawId(iDrawId);
+}
+
+void CTerrain::OnLButtonUp()
+{
+	if (m_bIsPicking)
+	{
+		m_bIsPicking = false;
+	}
 }
 
 void CTerrain::Render_Current_Draw_Tile()
@@ -340,7 +359,7 @@ void CTerrain::Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY)
 	pOut._21 *= _fX;
 	pOut._31 *= _fX;
 	pOut._41 *= _fX;
-		
+
 	pOut._12 *= _fY;
 	pOut._22 *= _fY;
 	pOut._32 *= _fY;
@@ -358,7 +377,7 @@ void CTerrain::RenderTileOutline(const TILE* tile)
 	float fY = WINCY / float(rc.bottom - rc.top);
 
 	D3DXVECTOR2 vPos1[5];
-	
+
 	float fCX(TILECX / 2.f);
 	float fCY(TILECY / 2.f);
 
@@ -390,7 +409,7 @@ void CTerrain::DrawDiamondGrid()
 
 	m_pLine->SetWidth(2.0f);
 	m_pLine->SetAntialias(TRUE); // 안티앨리어싱 키기
-	m_pLine->SetGLLines(TRUE); 
+	m_pLine->SetGLLines(TRUE);
 
 	RECT	rc{};
 
@@ -408,8 +427,8 @@ void CTerrain::DrawDiamondGrid()
 
 		for (int i = 0; i < arrLine.size(); ++i)
 		{
-			arrLine[i].x = fX * fCameraZoom * ( arrLine[i].x - vCameraOffset.x);
-			arrLine[i].y = fY * fCameraZoom * ( arrLine[i].y - vCameraOffset.y);
+			arrLine[i].x = fX * fCameraZoom * (arrLine[i].x - vCameraOffset.x);
+			arrLine[i].y = fY * fCameraZoom * (arrLine[i].y - vCameraOffset.y);
 		}
 
 		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));

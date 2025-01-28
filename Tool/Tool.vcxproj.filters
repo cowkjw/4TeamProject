@@ -73,6 +73,9 @@
     <Filter Include="03. Manager\03. JsonManager">
       <UniqueIdentifier>{ba1761bd-ac71-42cc-9c3f-95a4358a7e10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Manager\04. UndoManager">
+      <UniqueIdentifier>{d5fea6f7-1a4b-41ac-8efa-d073602e3fa9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -147,6 +150,9 @@
     <ClInclude Include="CJsonManager.h">
       <Filter>03. Manager\03. JsonManager</Filter>
     </ClInclude>
+    <ClInclude Include="CUndoManager.h">
+      <Filter>03. Manager\04. UndoManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -208,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="CDevice.cpp">
       <Filter>03. Manager\00. Device</Filter>
+    </ClCompile>
+    <ClCompile Include="CUndoManager.cpp">
+      <Filter>03. Manager\04. UndoManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

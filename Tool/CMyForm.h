@@ -29,7 +29,8 @@ private:
 	CFont		m_Font;
 public:
 	CUnitTool	m_UnitTool;
-	void Change_ListBox();
+	void OnButtonObjectList();
+	void OnButtonTileList();
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	DECLARE_MESSAGE_MAP()

@@ -32,8 +32,10 @@ typedef struct tagTile
 	bool bChange;
 
 	tagTile(): vPos(D3DXVECTOR3()),vSize(D3DXVECTOR2()), byOption(0),byDrawID(0), bChange(false){}
-	tagTile(const D3DXVECTOR3& _vPos, UINT _byDrawID, const D3DXVECTOR2& _vSize, UINT _byOption = 0)
-		: vPos(_vPos), byDrawID(_byDrawID), vSize(_vSize), byOption(_byOption), bChange(false){}
+	tagTile(const D3DXVECTOR3& _vPos, UINT _byDrawID, const D3DXVECTOR2& _vSize, 
+		const wstring& strStateKey, UINT _byOption = 0)
+		: vPos(_vPos), byDrawID(_byDrawID), vSize(_vSize), wstrStateKey(strStateKey),
+		byOption(_byOption), bChange(false){}
 
 	friend void to_json(json& j, const tagTile& t) {
 		j = json{

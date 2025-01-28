@@ -17,6 +17,8 @@ public:
 	enum { IDD = IDD_CFindFolderTree };
 #endif
 
+public:
+	void RefreshTree(const CString& newRootPath);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	void AddFolderToTree(HTREEITEM hParent, const CString& folderPath);

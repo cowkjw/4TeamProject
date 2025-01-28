@@ -23,6 +23,7 @@ public:
 	void Set_CameraOffsetX(float deltaX) { vCameraOffset.x += deltaX; }
 	void Set_CameraOffsetY(float deltaY) { vCameraOffset.y += deltaY; }
 	void Set_CameraZoom(bool bUp) { fCameraZoom = bUp ? fCameraZoom += 0.1f : max(0.f, fCameraZoom - 0.1f); }
+	void OnLButtonUp();
 public:
 	wstring m_stTileFolderName;
 	wstring m_stChangeFolderName;
@@ -32,14 +33,15 @@ private:
 	void Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY);
 	void RenderTileOutline(const TILE* tile);
 	void DrawDiamondGrid();
-private:
-	vector<TILE*>		m_vecTile;
+public:
+	vector<TILE> m_vecTile;
 	vector<array<D3DXVECTOR2, 5>>	m_vecLine;
 
 	vector<D3DXMATRIX> m_vecTileWorldMat;
 	vector<D3DXMATRIX> m_vecMiniTileWorldMat;
 	int m_iChangeDrawId;
 	bool m_bCanRender;
+	bool m_bIsPicking;
 	DWORD64 m_dwDrawTileRenderTime;
 	DWORD64 m_dwContinuousTime;
 	CToolView* m_pMainView;

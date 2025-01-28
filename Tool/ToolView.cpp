@@ -22,6 +22,7 @@
 #endif
 #include "CMiniView.h"
 #include "CKeyManager.h"
+#include "CUndoManager.h"
 #include "CMyForm.h"
 
 HWND	g_hWnd;
@@ -41,6 +42,7 @@ BEGIN_MESSAGE_MAP(CToolView, CView)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_TIMER()
 	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 // CToolView 생성/소멸
@@ -63,7 +65,7 @@ void CToolView::OnInitialUpdate()
 	CView::OnInitialUpdate();
 	m_nTimer = SetTimer(1, 16, NULL);
 	// AfxGetMainWnd : 현재 메인 윈도우의 값을 반환하는 전역함수
-	
+
 	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
 
 	RECT rcWnd{};
@@ -133,10 +135,10 @@ void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 		if (0 == pMyForm->m_TextureListBox.GetCount())
 			return;
 	}
-	
+
 	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
 
-//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
+	//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 	CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
 
 	pMiniView->Invalidate(FALSE);
@@ -195,20 +197,20 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 	m_fAlpha = max(0.0f, 255.0f - (fDeltaTime * 85.0f)); // 3초에 걸쳐 사라짐
 
 	// alpha값 적용
-	
+
 	RECT rc;
 	GetClientRect(&rc);
 	RECT textRect = { rc.right / 2 - 100, rc.bottom / 2 - 15, rc.right / 2 + 100, rc.bottom / 2 + 15 };
 	D3DXMATRIX matTrans;
 	D3DXMATRIX matScale;
-	D3DXMatrixScaling(&matScale, 10.f,10.f,5.f); // 폰트 크기 2배
+	D3DXMatrixScaling(&matScale, 10.f, 10.f, 5.f); // 폰트 크기 2배
 	D3DXMatrixTranslation(&matTrans, rc.right / 2.0f, rc.bottom / 2.0f, 0.f);
 	CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matTrans);
 	swprintf_s(szSpeed, L"Scroll Speed: %.1f", m_fSrollSpeed);
 	CDevice::Get_Instance()->Get_Font()->DrawTextW(CDevice::Get_Instance()->Get_Sprite(),
 		szSpeed,
 		lstrlen(szSpeed),
-		nullptr ,
+		nullptr,
 		DT_CENTER,
 		D3DCOLOR_ARGB((BYTE)m_fAlpha, 255, 255, 255));
 	m_pDevice->Render_End();
@@ -225,6 +227,7 @@ void CToolView::OnDestroy()
 	CKeyManager::Destroy_Instance();
 	Safe_Delete(m_pTerrain);
 	CTextureMgr::Destroy_Instance();
+	CUndoManager::Destroy_Instance();
 	m_pDevice->Destroy_Instance();
 
 }
@@ -296,7 +299,7 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		}
 		else
 		{
-		m_pTerrain->Set_CameraZoom(true);
+			m_pTerrain->Set_CameraZoom(true);
 
 		}
 	}
@@ -310,7 +313,7 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		else
 		{
 
-		m_pTerrain->Set_CameraZoom(false);
+			m_pTerrain->Set_CameraZoom(false);
 		}
 	}
 
@@ -324,6 +327,7 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 		// 게임 로직 업데이트
 		if (m_pDevice)
 		{
+
 			m_pTerrain->Update();
 			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
 			{
@@ -343,8 +347,20 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 				m_pTerrain->Set_CameraOffsetY(m_fSrollSpeed);
 			}
 
+			if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState('Z') & 0x0001))
+			{
+				CUndoManager::Get_Instance()->Undo();
+
+			}
+
+
 			// 명시적 렌더링
 			Invalidate(FALSE);
+			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+			CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
+
+			pMiniView->Invalidate(FALSE);
+			//CKeyManager::Get_Instance()->Update();
 		}
 	}
 
@@ -373,4 +389,13 @@ void CToolView::OnMouseMove(UINT nFlags, CPoint point)
 		pMiniView->Invalidate(FALSE);
 	}
 	CView::OnMouseMove(nFlags, point);
+}
+
+
+void CToolView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	m_pTerrain->OnLButtonUp();
+
+	CView::OnLButtonUp(nFlags, point);
 }

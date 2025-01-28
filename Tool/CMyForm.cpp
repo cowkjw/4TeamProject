@@ -24,13 +24,23 @@ CMyForm::~CMyForm()
 	OnDestroy();
 }
 
-void CMyForm::Change_ListBox()
+void CMyForm::OnButtonObjectList()
 {
 	if (nullptr == m_FindFolderTree.GetSafeHwnd())
 		m_FindFolderTree.Create(IDD_CFindFolderTree);	// 해당 id에 맞는 다이얼로그 생성
 
+	m_FindFolderTree.RefreshTree(_T("../Texture/Human"));
 	m_FindFolderTree.ShowWindow(SW_SHOW);
 //	m_TextureListBox.Load_TextureListOfObjcet();
+}
+
+void CMyForm::OnButtonTileList()
+{
+	if (nullptr == m_FindFolderTree.GetSafeHwnd())
+		m_FindFolderTree.Create(IDD_CFindFolderTree);	// 해당 id에 맞는 다이얼로그 생성
+
+	m_FindFolderTree.RefreshTree(_T("../Texture/Stage/Terrain"));
+	m_FindFolderTree.ShowWindow(SW_SHOW);
 }
 
 void CMyForm::DoDataExchange(CDataExchange* pDX)
@@ -43,7 +53,8 @@ void CMyForm::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CMyForm::OnLbnSelchangeList1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CMyForm::Change_ListBox)
+	ON_BN_CLICKED(IDC_BUTTON2, &CMyForm::OnButtonObjectList)
+	ON_BN_CLICKED(IDC_BUTTON3, &CMyForm::OnButtonTileList)
 END_MESSAGE_MAP()
 
 
