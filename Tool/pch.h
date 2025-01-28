@@ -22,6 +22,7 @@
 #include <fstream>
 #include <filesystem>
 #include "json.hpp"
+#include <deque>
 #include <locale>
 #include <codecvt>
 #include <regex>

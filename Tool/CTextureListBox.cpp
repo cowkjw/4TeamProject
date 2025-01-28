@@ -23,6 +23,7 @@ CTextureListBox::~CTextureListBox()
 
 void CTextureListBox::Load_TextureList(const wstring& folderPath)
 {
+    SetRedraw(FALSE);
     if (GetCount() != 0)
     {
         ResetContent();
@@ -32,51 +33,51 @@ void CTextureListBox::Load_TextureList(const wstring& folderPath)
     m_stCurFilePath = folderPath;
 	CFileFind finder;
     BOOL bWorking = finder.FindFile((folderPath + _T("\\*.*")).c_str());
-    vector<pair<CString, CString>> files;
+    vector<pair<wstring, wstring>> files;
+    files.reserve(300);
     while (bWorking)
     {
         bWorking = finder.FindNextFile();
 
         if (!finder.IsDots() && !finder.IsDirectory())
         {
-            CString fileName = finder.GetFileName();
-            // 특정 확장자만 필터링하려면:
-            if (fileName.Right(4).CompareNoCase(_T(".png")) == 0 ||
-                fileName.Right(4).CompareNoCase(_T(".jpg")) == 0)
+            wstring fileName = finder.GetFileName();
+            wstring ext = fileName.substr(fileName.length() - 4);
+            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+            if (ext == L".png" || ext == L".jpg")
             {
-                files.push_back({ fileName.Left(fileName.ReverseFind('.')), finder.GetFilePath()});
-               // AddString(fileName);
+                wstring nameWithoutExt = fileName.substr(0, fileName.rfind('.'));
+                files.push_back({ nameWithoutExt, finder.GetFilePath().GetString()});
             }
         }
     }
     finder.Close();
-
-    sort(files.begin(), files.end(), [&](const pair<CString, CString>& p1,const pair<CString, CString>& p2){
-        wregex pattern(L"(?:_|^)(\\d+)");  // _뒤 또는 시작하는 숫자
+    const wregex pattern(L"(?:_|^)(\\d+)");
+    sort(files.begin(), files.end(), [&pattern](const auto& p1, const auto& p2) {
         wsmatch matches;
-        wstring str = p1.first.GetString();
-        wstring str2 = p2.first.GetString();
-        int a, b; 
-        if (regex_search(str, matches, pattern)) 
-        { 
-            a = _ttoi(matches[1].str().c_str());
-        }
-        if (regex_search(str2, matches, pattern))
-        {
-            b= _ttoi(matches[1].str().c_str());
-        }
+        int a = 0, b = 0;
+
+        if (regex_search(p1.first, matches, pattern))
+            a = _wtoi(matches[1].str().c_str());
+        if (regex_search(p2.first, matches, pattern))
+            b = _wtoi(matches[1].str().c_str());
+
         return a < b;
         });
     wstring tmpPath;
-    for (const auto& file : files)
+    for (const auto& [name, path] : files)
     {
-        int nIndex = AddString(file.first);
+        int nIndex = AddString(name.c_str());
         if (tmpPath.empty())
         {
-        tmpPath = CFileInfo::Convert_RelativePath(file.second);
+            tmpPath = CFileInfo::Convert_RelativePath(path.c_str());
         }
-        m_FilePathMap[nIndex] = file.second;
+        m_FilePathMap[nIndex] = path;
     }
+
+    SetRedraw(TRUE);   // 리스트박스 갱신 재개
+    Invalidate();
     tmpPath = regex_replace(tmpPath, wregex(L"(.*\\\\.*?)(\\d+)([^\\\\]*$)"), L"$1%d$3");
     CTextureMgr::Get_Instance()->Insert_Texture(tmpPath, TEX_MULTI,m_stCategory, m_stFolderName, (int)files.size());
 }

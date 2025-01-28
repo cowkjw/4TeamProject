@@ -28,10 +28,10 @@ private:
 	CFont		m_Font;
 public:
 	CUnitTool	m_UnitTool;
-	void Change_ListBox();
 	void SaveTileData(const vector<TILE*>& vecTile, const CString& FileName);
 	void LoadTileData(vector<TILE*>& vecTile, const CString& FileName);
-	
+	void OnButtonObjectList();
+	void OnButtonTileList();
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 	DECLARE_MESSAGE_MAP()
