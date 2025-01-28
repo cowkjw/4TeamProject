@@ -4,7 +4,6 @@
 #include "CFindFolderTree.h"
 
 
-
 // CMyForm 폼 보기
 
 class CMyForm : public CFormView
@@ -29,6 +28,8 @@ private:
 	CFont		m_Font;
 public:
 	CUnitTool	m_UnitTool;
+	void SaveTileData(const vector<TILE*>& vecTile, const CString& FileName);
+	void LoadTileData(vector<TILE*>& vecTile, const CString& FileName);
 	void OnButtonObjectList();
 	void OnButtonTileList();
 protected:
@@ -42,6 +43,8 @@ public:
 	CFindFolderTree m_FindFolderTree;
 	CStatic m_TextrueImage;
 
+	afx_msg void OnBnClickedButton4();
+	afx_msg void OnBnClickedButton3();
 };
 
 

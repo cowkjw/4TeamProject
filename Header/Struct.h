@@ -59,6 +59,29 @@ typedef struct tagTile
 		j.at("bChange").get_to(t.bChange);
 		j.at("folder").get_to(t.wstrStateKey);
 	}
+
+	void Serialize(CArchive& ar)
+	{
+		if (ar.IsStoring()) // 저장할 때
+		{
+			ar << vPos.x << vPos.y << vPos.z;
+			ar << vSize.x << vSize.y;
+			ar << byOption << byDrawID;
+			ar << (wchar_t*)wstrStateKey.c_str();  // wide string 처리
+			ar << bChange;
+		}
+		else // 불러올 때
+		{
+			ar >> vPos.x >> vPos.y >> vPos.z;
+			ar >> vSize.x >> vSize.y;
+			ar >> byOption >> byDrawID;
+			CString tempStr;  // CString을 사용하여 상태키를 읽음
+			ar >> tempStr;
+			wstrStateKey = tempStr.GetString();  // CString을 wstring으로 변환
+			ar >> bChange;
+		}
+	}
+
 }TILE;
 
 typedef	struct tagUnitData

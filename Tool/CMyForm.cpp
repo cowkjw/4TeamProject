@@ -53,6 +53,8 @@ void CMyForm::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CMyForm::OnLbnSelchangeList1)
+	ON_BN_CLICKED(IDC_BUTTON5, &CMyForm::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_BUTTON4, &CMyForm::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMyForm::OnButtonObjectList)
 	ON_BN_CLICKED(IDC_BUTTON3, &CMyForm::OnButtonTileList)
 END_MESSAGE_MAP()
@@ -118,3 +120,55 @@ void CMyForm::OnLbnSelchangeList1()
 		}
 	}
 }
+
+//Save 버튼
+void CMyForm::OnBnClickedButton3()
+{
+	SaveTileData(, _T("tileDate.dat"));
+}
+
+//Load 버튼
+void CMyForm::OnBnClickedButton4()
+{
+	vector<TILE*> vecLoadTile;
+	LoadTileData(vecLoadTile, _T("tileDate.dat"));
+
+
+}
+
+void CMyForm::SaveTileData(const vector<TILE*>& vecTile, const CString& FileName)
+{
+	CFile File(FileName, CFile::modeCreate | CFile::modeWrite);
+	CArchive Ar(&File, CArchive::store);
+
+	int iTileCount = vecTile.size();
+	Ar << iTileCount; // 타일의 개수를 저장
+
+	for (int i = 0; i < iTileCount; ++i)
+	{
+		vecTile[i]->Serialize(Ar);
+	}
+
+	Ar.Close();
+	File.Close();
+}
+
+void CMyForm::LoadTileData(vector<TILE*>& vecTile, const CString& FileName)
+{
+	CFile File(FileName, CFile::modeRead);
+	CArchive Ar(&File, CArchive::load);
+
+	int iTileCount;
+	Ar >> iTileCount; // 타일의 개수를 불러오기
+
+	vecTile.resize(iTileCount);
+
+	for (int i = 0; i < iTileCount; ++i)
+	{
+		vecTile[i]->Serialize(Ar);
+	}
+
+	Ar.Close();
+	File.Close();
+}
+

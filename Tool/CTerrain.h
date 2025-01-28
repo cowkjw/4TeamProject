@@ -4,6 +4,7 @@
 #include "ToolView.h"
 #include "CMiniView.h"
 
+
 class CTerrain
 {
 public:
