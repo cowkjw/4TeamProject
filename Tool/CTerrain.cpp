@@ -291,6 +291,9 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 
 		if (bInner)
 		{
+			m_LineIndex = i;
+
+
 			TILE newTile(
 				{ m_vecLine[i][0].x, m_vecLine[i][0].y - TILECY * 0.5f, 0.f },  // vPos (1¹ø)
 				m_iChangeDrawId,                                                  // byDrawID (2¹ø)

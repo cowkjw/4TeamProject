@@ -196,6 +196,7 @@
     <ClInclude Include="CMiniView.h" />
     <ClInclude Include="CMultiTexture.h" />
     <ClInclude Include="CMyForm.h" />
+    <ClInclude Include="CObj.h" />
     <ClInclude Include="CPerformanceTimer.h" />
     <ClInclude Include="CSingleTexture.h" />
     <ClInclude Include="CTerrain.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="CMiniView.cpp" />
     <ClCompile Include="CMultiTexture.cpp" />
     <ClCompile Include="CMyForm.cpp" />
+    <ClCompile Include="CObj.cpp" />
     <ClCompile Include="CSingleTexture.cpp" />
     <ClCompile Include="CTerrain.cpp" />
     <ClCompile Include="CTexture.cpp" />

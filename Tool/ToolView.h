@@ -9,6 +9,7 @@
 
 class CTerrain;
 class CToolDoc;
+class CObj;
 
 class CToolView : public CView
 {
@@ -51,7 +52,8 @@ public:
 
 public:
 	CDevice*	m_pDevice;
-	CTerrain* m_pTerrain;
+	CTerrain*	m_pTerrain;
+	CObj*		m_pObj;
 	UINT_PTR m_nTimer;
 	float m_fSrollSpeed;
 	float m_fAlpha; 

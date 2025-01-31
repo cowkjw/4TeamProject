@@ -76,6 +76,9 @@
     <Filter Include="03. Manager\04. UndoManager">
       <UniqueIdentifier>{d5fea6f7-1a4b-41ac-8efa-d073602e3fa9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04. Etc\04. Obj">
+      <UniqueIdentifier>{5bcbc595-a6e4-4bc4-9ac4-6fc997436d83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -153,6 +156,9 @@
     <ClInclude Include="CUndoManager.h">
       <Filter>03. Manager\04. UndoManager</Filter>
     </ClInclude>
+    <ClInclude Include="CObj.h">
+      <Filter>04. Etc\04. Obj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -217,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="CUndoManager.cpp">
       <Filter>03. Manager\04. UndoManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CObj.cpp">
+      <Filter>04. Etc\04. Obj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
