@@ -3,7 +3,7 @@
 #include "Include.h"
 #include "ToolView.h"
 #include "CMiniView.h"
-
+#include "CObj.h"
 
 class CTerrain
 {
@@ -50,5 +50,7 @@ public:
 	LPD3DXLINE m_pLine;
 	float fCameraZoom = 1.0f;  // 줌 레벨 (1.0이 기본)
 	D3DXVECTOR2 vCameraOffset;
+
+	int m_LineIndex;
 };
 

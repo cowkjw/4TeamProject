@@ -15,6 +15,7 @@
 #include "CDevice.h"
 #include "CTextureMgr.h"
 #include "CTerrain.h"
+#include "CObj.h"
 #include "MainFrm.h"
 
 #ifdef _DEBUG
@@ -48,7 +49,7 @@ END_MESSAGE_MAP()
 // CToolView 생성/소멸
 
 CToolView::CToolView() noexcept
-	: m_pDevice(CDevice::Get_Instance()), m_pTerrain(nullptr), m_nTimer(0), m_fSrollSpeed(0.f), m_fAlpha(0.f), m_dwDisplayTime(0)
+	: m_pDevice(CDevice::Get_Instance()), m_pTerrain(nullptr), m_nTimer(0), m_fSrollSpeed(0.f), m_fAlpha(0.f), m_dwDisplayTime(0), m_pObj(nullptr)
 	//, m_pSingle(nullptr)
 
 {
@@ -122,6 +123,11 @@ void CToolView::OnInitialUpdate()
 	m_fSrollSpeed = 5.f;
 	m_fAlpha = 255.f;
 
+	if (!m_pObj)
+	{
+		m_pObj = new CObj;
+		m_pObj->Initialize();
+	}
 }
 
 void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
@@ -174,6 +180,8 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 	//								D3DCOLOR_ARGB(255, 255, 255, 255)); // 출력할 이미지와 섞을 색상 값, 0xffffffff를 넘겨주면 섞지 않고 원본 색상 유지
 	m_pTerrain->Update();
 	m_pTerrain->Render();
+
+	m_pObj->Render();
 	// 폰트의 출력 위치를 조정 가능
 	// D3DXMatrixTranslation(&matTrans, 200.f, 200.f, 0.f);
 	// m_pDevice->Get_Sprite()->SetTransform(&matTrans);
@@ -300,7 +308,7 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		else
 		{
 			m_pTerrain->Set_CameraZoom(true);
-
+			m_pObj->Set_CameraZoom(true);
 		}
 	}
 	else
@@ -312,8 +320,8 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		}
 		else
 		{
-
 			m_pTerrain->Set_CameraZoom(false);
+			m_pObj->Set_CameraZoom(false);
 		}
 	}
 
@@ -332,19 +340,23 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
 			{
 				m_pTerrain->Set_CameraOffsetX(-m_fSrollSpeed);
+				m_pObj->Set_CameraOffsetX(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('D'))
 			{
 				m_pTerrain->Set_CameraOffsetX(m_fSrollSpeed);
+				m_pObj->Set_CameraOffsetX(m_fSrollSpeed);
 			}
 
 			if (CKeyManager::Get_Instance()->Key_Pressing('W'))
 			{
 				m_pTerrain->Set_CameraOffsetY(-m_fSrollSpeed);
+				m_pObj->Set_CameraOffsetY(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('S'))
 			{
 				m_pTerrain->Set_CameraOffsetY(m_fSrollSpeed);
+				m_pObj->Set_CameraOffsetY(m_fSrollSpeed);
 			}
 
 			if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState('Z') & 0x0001))
@@ -353,7 +365,7 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 
 			}
 
-
+			m_pObj->Update();
 			// 명시적 렌더링
 			Invalidate(FALSE);
 			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
@@ -382,12 +394,15 @@ void CToolView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 
 		m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
-
+		
 		//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
 
 		pMiniView->Invalidate(FALSE);
 	}
+
+	m_pObj->Set_Position(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+
 	CView::OnMouseMove(nFlags, point);
 }
 
