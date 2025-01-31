@@ -24,7 +24,8 @@ public:
 		const int iCnt = 0);
 
 	void		Release();
-
+	HRESULT		Insert_Texture_Directory(const wstring& pObjKey, const wstring& pStateKey);
+	HRESULT Find_Texture_Path(const wstring& basePath, const wstring& pObjKey, const wstring& pStateKey, wstring& outPath);
 
 private:
 	map<wstring, map<wstring, CTexture*>> m_mapTex;

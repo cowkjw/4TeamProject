@@ -23,14 +23,14 @@ void CTerrain::Initialize()
 {
 	D3DXCreateLine(CDevice::Get_Instance()->Get_Device(), &m_pLine);
 
-	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
-		L"../Texture/Stage/Terrain/Tile/Act2/Tile_%d.png",
-		TEX_MULTI, L"Tile", L"Act2", 108)))
-	{
-		AfxMessageBox(L"Terrain Tile_Act2 Insert Failed");
-		return;
-	}
-	m_stTileFolderName = L"Act2";
+	//if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
+	//	L"../Texture/Stage/Terrain/Tile/Act2/Tile_%d.png",
+	//	TEX_MULTI, L"Tile", L"Act2", 108)))
+	//{
+	//	AfxMessageBox(L"Terrain Tile_Act2 Insert Failed");
+	//	return;
+	//}
+	//m_stTileFolderName = L"Act2";
 
 	/*for (int i = 0; i < TILEY; ++i)
 	{
