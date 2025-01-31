@@ -106,15 +106,23 @@ void CMyForm::OnLbnSelchangeList1()
 			dc.FillSolidRect(rect, RGB(255, 255, 255));
 			image.Draw(dc, rect);
 
+			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+			CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
 			if (CurCategory == L"Tile")
 			{
 
-			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
-			CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
 
 			CTerrain* pTerrain = pView->m_pTerrain;
 			pTerrain->m_stTileFolderName = m_TextureListBox.m_stFolderName;
 			pTerrain->Change_DrawID(nIndex, m_TextureListBox.m_stFolderName);
+			}
+			else
+			{
+				CObj* pObj = pView->m_pObj;
+				if (pObj)
+				{
+					pObj->Set_Sprite(m_TextureListBox.m_stFolderName,m_TextureListBox.m_stCategory, m_TextureListBox.GetCount());
+				}
 			}
 
 		}

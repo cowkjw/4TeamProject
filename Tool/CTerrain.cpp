@@ -10,7 +10,7 @@
 
 CTerrain::CTerrain() :
 	m_bCanRender(false), m_pLine(nullptr), m_bIsPicking(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
-	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f, 0.f))
+	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f, 0.f)), fCameraZoom(1.0f), m_LineIndex(0)
 {
 }
 
@@ -428,7 +428,7 @@ void CTerrain::DrawDiamondGrid()
 	{
 		auto arrLine = line;
 
-		for (int i = 0; i < arrLine.size(); ++i)
+		for (size_t i = 0; i < arrLine.size(); ++i)
 		{
 			arrLine[i].x = fX * fCameraZoom * (arrLine[i].x - vCameraOffset.x);
 			arrLine[i].y = fY * fCameraZoom * (arrLine[i].y - vCameraOffset.y);

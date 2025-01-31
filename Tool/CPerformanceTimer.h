@@ -8,7 +8,8 @@ private:
     LARGE_INTEGER m_endTime;
 
 public:
-    CPerformanceTimer() {
+	CPerformanceTimer() : m_frequency(), m_startTime(), m_endTime()
+    {
         QueryPerformanceFrequency(&m_frequency);
     }
 

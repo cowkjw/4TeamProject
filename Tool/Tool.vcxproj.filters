@@ -79,6 +79,9 @@
     <Filter Include="04. Etc\04. Obj">
       <UniqueIdentifier>{5bcbc595-a6e4-4bc4-9ac4-6fc997436d83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Manager\05. ObjManager">
+      <UniqueIdentifier>{543157d7-84d9-43e7-ada6-afd0aa7e1772}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Tool.h">
@@ -159,6 +162,9 @@
     <ClInclude Include="CObj.h">
       <Filter>04. Etc\04. Obj</Filter>
     </ClInclude>
+    <ClInclude Include="CObjManager.h">
+      <Filter>03. Manager\05. ObjManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
@@ -226,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="CObj.cpp">
       <Filter>04. Etc\04. Obj</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjManager.cpp">
+      <Filter>03. Manager\05. ObjManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

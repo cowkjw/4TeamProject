@@ -28,7 +28,11 @@ public:
 	
 	void Set_Terrain(CTerrain* _Terrain) { m_pTerrain = _Terrain; }
 	void Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY);
-
+	void Set_Sprite(const wstring& strStateKey, const wstring& strObjKey,int iMaxFrame);
+public:
+	wstring m_strStateKey;
+	wstring m_strObjKey;
+	bool m_bIsSet;
 private:
 	float fCameraZoom = 1.0f;  // 줌 레벨 (1.0이 기본)
 	D3DXVECTOR2 vCameraOffset;

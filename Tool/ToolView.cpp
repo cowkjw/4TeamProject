@@ -15,7 +15,7 @@
 #include "CDevice.h"
 #include "CTextureMgr.h"
 #include "CTerrain.h"
-#include "CObj.h"
+#include "CObjManager.h"
 #include "MainFrm.h"
 
 #ifdef _DEBUG
@@ -146,7 +146,13 @@ void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 	CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
-
+	if (m_pObj)
+	{
+		m_pObj->Picking_Obj();
+		CObjManager::Get_Instance()->Add_Obj(m_pObj);
+		m_pObj = new CObj;
+		m_pObj->Initialize();
+	}
 	pMiniView->Invalidate(FALSE);
 }
 
@@ -182,6 +188,7 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 	m_pTerrain->Render();
 
 	m_pObj->Render();
+	CObjManager::Get_Instance()->Render();
 	// 폰트의 출력 위치를 조정 가능
 	// D3DXMatrixTranslation(&matTrans, 200.f, 200.f, 0.f);
 	// m_pDevice->Get_Sprite()->SetTransform(&matTrans);
@@ -201,7 +208,7 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 
 	CDevice::Get_Instance()->Get_Sprite()->Begin(D3DXSPRITE_ALPHABLEND);
 	TCHAR szSpeed[32];
-	float fDeltaTime = (GetTickCount() - m_dwDisplayTime) / 1000.0f;
+	float fDeltaTime = (GetTickCount64() - m_dwDisplayTime) / 1000.0f;
 	m_fAlpha = max(0.0f, 255.0f - (fDeltaTime * 85.0f)); // 3초에 걸쳐 사라짐
 
 	// alpha값 적용
@@ -231,7 +238,8 @@ void CToolView::OnDestroy()
 	KillTimer(m_nTimer);
 	CView::OnDestroy();
 
-	//Safe_Delete(m_pSingle);
+	Safe_Delete(m_pObj);
+	CObjManager::Destroy_Instance();
 	CKeyManager::Destroy_Instance();
 	Safe_Delete(m_pTerrain);
 	CTextureMgr::Destroy_Instance();
@@ -308,7 +316,11 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		else
 		{
 			m_pTerrain->Set_CameraZoom(true);
-			m_pObj->Set_CameraZoom(true);
+			if (m_pObj)
+			{
+				m_pObj->Set_CameraZoom(true);
+			}
+			CObjManager::Get_Instance()->Set_CameraZoom(true);
 		}
 	}
 	else
@@ -321,7 +333,12 @@ BOOL CToolView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		else
 		{
 			m_pTerrain->Set_CameraZoom(false);
-			m_pObj->Set_CameraZoom(false);
+			if (m_pObj)
+			{
+				m_pObj->Set_CameraZoom(false);
+			}
+
+			CObjManager::Get_Instance()->Set_CameraZoom(false);
 		}
 	}
 
@@ -340,23 +357,39 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
 			{
 				m_pTerrain->Set_CameraOffsetX(-m_fSrollSpeed);
-				m_pObj->Set_CameraOffsetX(-m_fSrollSpeed);
+				if (m_pObj)
+				{
+					m_pObj->Set_CameraOffsetX(-m_fSrollSpeed);
+				}
+				CObjManager::Get_Instance()->Set_CameraOffsetX(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('D'))
 			{
 				m_pTerrain->Set_CameraOffsetX(m_fSrollSpeed);
-				m_pObj->Set_CameraOffsetX(m_fSrollSpeed);
+				if (m_pObj)
+				{
+					m_pObj->Set_CameraOffsetX(m_fSrollSpeed);
+				}
+				CObjManager::Get_Instance()->Set_CameraOffsetX(m_fSrollSpeed);
 			}
 
 			if (CKeyManager::Get_Instance()->Key_Pressing('W'))
 			{
 				m_pTerrain->Set_CameraOffsetY(-m_fSrollSpeed);
-				m_pObj->Set_CameraOffsetY(-m_fSrollSpeed);
+				if (m_pObj)
+				{
+					m_pObj->Set_CameraOffsetY(-m_fSrollSpeed);
+				}
+				CObjManager::Get_Instance()->Set_CameraOffsetY(-m_fSrollSpeed);
 			}
 			if (CKeyManager::Get_Instance()->Key_Pressing('S'))
 			{
 				m_pTerrain->Set_CameraOffsetY(m_fSrollSpeed);
-				m_pObj->Set_CameraOffsetY(m_fSrollSpeed);
+				if (m_pObj)
+				{
+					m_pObj->Set_CameraOffsetY(m_fSrollSpeed);
+				}
+				CObjManager::Get_Instance()->Set_CameraOffsetY(m_fSrollSpeed);
 			}
 
 			if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState('Z') & 0x0001))
@@ -364,8 +397,11 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 				CUndoManager::Get_Instance()->Undo();
 
 			}
-
-			m_pObj->Update();
+			CObjManager::Get_Instance()->Update();
+			if (m_pObj)
+			{
+				m_pObj->Update();
+			}
 			// 명시적 렌더링
 			Invalidate(FALSE);
 			CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
