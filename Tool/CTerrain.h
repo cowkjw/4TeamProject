@@ -17,13 +17,15 @@ public:
 	void		Render();
 	void		Release();
 	void Mini_Render();
-	void Picking_Tile(const D3DXVECTOR3& mousePoint);
+	void Picking_Tile(const D3DXVECTOR3& mousePoint,bool bIsObjPick,bool bOnTileMode);
 	void Change_DrawID(int iDrawId, const wstring& stChangeFolderName);
 	void	Set_MainView(CToolView* pMainView) { m_pMainView = pMainView; }
 	void	Set_MiniView(CMiniView* pMiniView) { m_pMiniView = pMiniView; }
 	void Set_CameraOffsetX(float deltaX) { vCameraOffset.x += deltaX; }
 	void Set_CameraOffsetY(float deltaY) { vCameraOffset.y += deltaY; }
 	void Set_CameraZoom(bool bUp) { fCameraZoom = bUp ? fCameraZoom += 0.1f : max(0.f, fCameraZoom - 0.1f); }
+	auto& Get_CameraOffset() { return vCameraOffset; }	
+	auto& Get_ZoomLevel() { return fCameraZoom; }
 	void OnLButtonUp();
 public:
 	wstring m_stTileFolderName;

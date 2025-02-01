@@ -205,9 +205,9 @@ void CTerrain::Mini_Render()
 	}
 }
 
-void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
+void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint, bool bIsObjPick, bool bOnTileMode)
 {
-	if (!m_bIsPicking)
+	if (!m_bIsPicking&& bOnTileMode)
 	{
 		CUndoManager::Get_Instance()->SaveState(UndoType::TILE);
 	}
@@ -215,96 +215,85 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint)
 	vNewMouse.x = mousePoint.x / fCameraZoom + vCameraOffset.x;
 	vNewMouse.y = mousePoint.y / fCameraZoom + vCameraOffset.y;
 
-	for (auto& pTile : m_vecTile)
-	{
-		bool bInner = true;
-
-		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
-
-		upPoint = { pTile.vPos.x, pTile.vPos.y + TILECY * 0.5f, 0.f };
-		rightPoint = { pTile.vPos.x + TILECX * 0.5f, pTile.vPos.y, 0.f };
-		bottomPoint = { pTile.vPos.x, pTile.vPos.y - TILECY * 0.5f, 0.f };
-		leftPoint = { pTile.vPos.x - TILECX * 0.5f, pTile.vPos.y, 0.f };
-
-		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
-		vector<D3DXVECTOR3> vecCWPolyVec{ rightPoint - upPoint,
-											bottomPoint - rightPoint,
-											leftPoint - bottomPoint,
-											upPoint - leftPoint };
-
-		for (int i = 0; i < (int)vecCWStartPoints.size(); i++)
-		{
-			D3DXVECTOR3 vMouse = vNewMouse - vecCWStartPoints[i];
-			D3DXVECTOR3 tmp(-vecCWPolyVec[i].y, vecCWPolyVec[i].x, vecCWPolyVec[i].z);
-
-			D3DXVec3Normalize(&vMouse, &vMouse);
-			D3DXVec3Normalize(&tmp, &tmp);
-
-			if (D3DXVec3Dot(&tmp, &vMouse) > 0.f)
-			{
-				bInner = false;
-				break;
-			}
-		}
-
-		if (bInner)
-		{
-			pTile.byDrawID = m_iChangeDrawId;
-			pTile.wstrStateKey = m_stChangeFolderName;
-			pTile.bChange = true;
-			m_bIsPicking = true;
-			return;
-		}
-	}
-
+	int pickedLineIndex = -1;
 	for (size_t i = 0; i < TILEX * TILEY; ++i)
 	{
 		bool bInner = true;
+		D3DXVECTOR3 upPoint = { m_vecLine[i][0].x, m_vecLine[i][0].y, 0.f };
+		D3DXVECTOR3 rightPoint = { m_vecLine[i][1].x, m_vecLine[i][1].y, 0.f };
+		D3DXVECTOR3 bottomPoint = { m_vecLine[i][2].x, m_vecLine[i][2].y, 0.f };
+		D3DXVECTOR3 leftPoint = { m_vecLine[i][3].x, m_vecLine[i][3].y, 0.f };
 
-		D3DXVECTOR3 upPoint, bottomPoint, leftPoint, rightPoint;
+		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint, rightPoint, bottomPoint, leftPoint };
+		vector<D3DXVECTOR3> vecCWPolyVec{
+			rightPoint - upPoint,
+			bottomPoint - rightPoint,
+			leftPoint - bottomPoint,
+			upPoint - leftPoint
+		};
 
-		upPoint = { m_vecLine[i][0].x, m_vecLine[i][0].y, 0.f };
-		rightPoint = { m_vecLine[i][1].x, m_vecLine[i][1].y, 0.f };
-		bottomPoint = { m_vecLine[i][2].x, m_vecLine[i][2].y, 0.f };
-		leftPoint = { m_vecLine[i][3].x, m_vecLine[i][3].y, 0.f };
-
-		vector<D3DXVECTOR3> vecCWStartPoints{ upPoint ,rightPoint, bottomPoint, leftPoint };
-		vector<D3DXVECTOR3> vecCWPolyVec{ rightPoint - upPoint,
-											bottomPoint - rightPoint,
-											leftPoint - bottomPoint,
-											upPoint - leftPoint };
-
-		for (int i = 0; i < (int)vecCWStartPoints.size(); i++)
+		for (int j = 0; j < (int)vecCWStartPoints.size(); j++)
 		{
-			D3DXVECTOR3 vMouse = vNewMouse - vecCWStartPoints[i];
-			D3DXVECTOR3 tmp(-vecCWPolyVec[i].y, vecCWPolyVec[i].x, vecCWPolyVec[i].z);
-
+			D3DXVECTOR3 vMouse = vNewMouse - vecCWStartPoints[j];
+			D3DXVECTOR3 tmp(-vecCWPolyVec[j].y, vecCWPolyVec[j].x, vecCWPolyVec[j].z);
 			D3DXVec3Normalize(&vMouse, &vMouse);
 			D3DXVec3Normalize(&tmp, &tmp);
-
 			if (D3DXVec3Dot(&tmp, &vMouse) > 0.f)
 			{
 				bInner = false;
 				break;
 			}
 		}
-
 		if (bInner)
 		{
-			m_LineIndex = i;
+			pickedLineIndex = i;
+			break;
+		}
+	}
 
+	// 라인을 찾았다면
+	if (pickedLineIndex != -1)
+	{
+		m_LineIndex = pickedLineIndex;  // 항상 라인 인덱스 업데이트
 
+		// 이미 타일이 있는지 확인
+		bool tileExists = false;
+		for (auto& pTile : m_vecTile)
+		{
+			D3DXVECTOR3 tileCenter = {
+				m_vecLine[pickedLineIndex][0].x,
+				m_vecLine[pickedLineIndex][0].y - TILECY * 0.5f,
+				0.f
+			};
+
+			// 타일의 중심점이 일치하는지 확인
+			if (abs(pTile.vPos.x - tileCenter.x) < 0.1f &&
+				abs(pTile.vPos.y - tileCenter.y) < 0.1f)
+			{
+				tileExists = true;
+				if (!bIsObjPick)
+				{
+					pTile.byDrawID = m_iChangeDrawId;
+					pTile.wstrStateKey = m_stChangeFolderName;
+					pTile.bChange = true;
+					m_bIsPicking = true;
+				}
+				break;
+			}
+		}
+
+		// 타일이 없다면 새로 생성
+		if (!tileExists && !bIsObjPick&& bOnTileMode)
+		{
 			TILE newTile(
-				{ m_vecLine[i][0].x, m_vecLine[i][0].y - TILECY * 0.5f, 0.f },  // vPos (1번)
-				m_iChangeDrawId,                                                  // byDrawID (2번)
-				{ (float)TILECX, (float)TILECY },                                // vSize (3번)
-				m_stChangeFolderName,                                            // strStateKey (4번)
-				0                                                                // byOption (5번)
+				{ m_vecLine[pickedLineIndex][0].x, m_vecLine[pickedLineIndex][0].y - TILECY * 0.5f, 0.f },
+				m_iChangeDrawId,
+				{ (float)TILECX, (float)TILECY },
+				m_stChangeFolderName,
+				0
 			);
-
 			m_vecTile.push_back(newTile);
 			m_bIsPicking = true;
-			break;
 		}
 	}
 }

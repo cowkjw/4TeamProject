@@ -12,6 +12,49 @@ class CObj
 public:
 	CObj();
 	~CObj();
+	CObj(const CObj&& other) noexcept
+		: m_pTerrain(other.m_pTerrain), m_AnimeTime(other.m_AnimeTime), m_bIsSet(other.m_bIsSet), m_pMainView(other.m_pMainView), m_strStateKey(other.m_strStateKey), m_strObjKey(other.m_strObjKey)
+	{
+		m_tInfo = other.m_tInfo;
+		m_tFrame = other.m_tFrame;
+		m_LineIndex = other.m_LineIndex;
+		fCameraZoom = other.fCameraZoom;
+		vCameraOffset = other.vCameraOffset;
+	}
+
+	CObj& operator=(const CObj&& other) noexcept
+	{
+		if (this == &other)
+			return *this;
+		m_pTerrain = other.m_pTerrain;
+		m_AnimeTime = other.m_AnimeTime;
+		m_bIsSet = other.m_bIsSet;
+		m_pMainView = other.m_pMainView;
+		m_strStateKey = other.m_strStateKey;
+		m_strObjKey = other.m_strObjKey;
+		m_tInfo = other.m_tInfo;
+		m_tFrame = other.m_tFrame;
+		m_LineIndex = other.m_LineIndex;
+		fCameraZoom = other.fCameraZoom;
+		vCameraOffset = other.vCameraOffset;
+		return *this;
+	}
+
+	CObj(const CObj& other)
+	{
+		m_pTerrain = other.m_pTerrain;
+		m_AnimeTime = other.m_AnimeTime;
+		m_bIsSet = other.m_bIsSet;
+		m_pMainView = other.m_pMainView;
+		m_strStateKey = other.m_strStateKey;
+		m_strObjKey = other.m_strObjKey;
+		m_tInfo = other.m_tInfo;
+		m_tFrame = other.m_tFrame;
+		m_LineIndex = other.m_LineIndex;
+		fCameraZoom = other.fCameraZoom;
+		vCameraOffset = other.vCameraOffset;
+	}
+
 
 public:
 	void		Initialize();
@@ -33,7 +76,6 @@ public:
 	wstring m_strStateKey;
 	wstring m_strObjKey;
 	bool m_bIsSet;
-private:
 	float fCameraZoom = 1.0f;  // 줌 레벨 (1.0이 기본)
 	D3DXVECTOR2 vCameraOffset;
 	CToolView* m_pMainView;
@@ -44,4 +86,6 @@ private:
 
 	int m_LineIndex;
 	CTerrain* m_pTerrain;
+private:
+
 };

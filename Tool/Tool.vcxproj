@@ -198,6 +198,7 @@
     <ClInclude Include="CMyForm.h" />
     <ClInclude Include="CObj.h" />
     <ClInclude Include="CObjManager.h" />
+    <ClInclude Include="ConsoleWindow.h" />
     <ClInclude Include="CPerformanceTimer.h" />
     <ClInclude Include="CSingleTexture.h" />
     <ClInclude Include="CTerrain.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="CMyForm.cpp" />
     <ClCompile Include="CObj.cpp" />
     <ClCompile Include="CObjManager.cpp" />
+    <ClCompile Include="ConsoleWindow.cpp" />
     <ClCompile Include="CSingleTexture.cpp" />
     <ClCompile Include="CTerrain.cpp" />
     <ClCompile Include="CTexture.cpp" />

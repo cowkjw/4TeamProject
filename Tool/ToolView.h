@@ -58,6 +58,8 @@ public:
 	float m_fSrollSpeed;
 	float m_fAlpha; 
 	DWORD m_dwDisplayTime;
+	bool m_bIsObj;
+	bool m_bIsTileMode;
 	//CSingleTexture* m_pSingle;
 
 public:

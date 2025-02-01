@@ -14,11 +14,12 @@ public:
 	void Set_CameraOffsetX(float deltaX);
 	void Set_CameraOffsetY(float deltaY);
 	void Set_CameraZoom(bool bUp);
+public:
+	vector<CObj*> m_vecObj;
 private:
 	CObjManager() = default;
 	~CObjManager() { Release(); }
 
-	vector<CObj*> m_vecObj;
 
 };
 
