@@ -59,7 +59,14 @@ void ClassName::Destroy_Instance()						\
 	}													\
 }
 
-
+static D3DXVECTOR3 ScreenToWorld(const POINT& screenPos, float zoomLevel, const D3DXVECTOR2& cameraOffset)
+{
+	return D3DXVECTOR3(
+		(screenPos.x / zoomLevel) + cameraOffset.x,
+		(screenPos.y / zoomLevel) + cameraOffset.y,
+		0.f
+	);
+}
 
 
 // 선언과 동시에 초기화 불가능, 먼저 선언된 전역변수와 자료형, 변수명까지 일치하는 상태에서만 사용 가능

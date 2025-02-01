@@ -7,6 +7,7 @@
 #include "MainFrm.h"
 #include "ToolView.h"
 #include "CTerrain.h"
+#include "CUndoManager.h"
 
 
 // CMyForm
@@ -115,9 +116,12 @@ void CMyForm::OnLbnSelchangeList1()
 			CTerrain* pTerrain = pView->m_pTerrain;
 			pTerrain->m_stTileFolderName = m_TextureListBox.m_stFolderName;
 			pTerrain->Change_DrawID(nIndex, m_TextureListBox.m_stFolderName);
+			pView->m_bIsTileMode = true;
 			}
 			else
 			{
+				pView->m_bIsTileMode = false;
+				pView->m_bIsObj = true;
 				CObj* pObj = pView->m_pObj;
 				if (pObj)
 				{
@@ -211,9 +215,9 @@ void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& strFolderPath, 
 	int iTileCount = 0;
 
 	Ar >> iTileCount;
+	CUndoManager::Get_Instance()->SaveState(UndoType::TILE);
 	vecTile.clear();
 	vecTile.resize(iTileCount);
-
 	for (int i = 0; i < iTileCount; ++i)
 	{
 		vecTile[i].Serialize(Ar);

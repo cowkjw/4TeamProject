@@ -19,14 +19,8 @@ void CObj::Initialize()
 	m_pMainView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
 
 	m_pTerrain = m_pMainView->m_pTerrain;
-
-	if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
-		L"../Texture/Human/NPC/Akara/%d.png",
-		TEX_MULTI, L"NPC", L"Akara", 13)))
-	{
-		AfxMessageBox(L"NPC Akara Insert Failed");
-		return;
-	}
+	fCameraZoom = m_pTerrain->fCameraZoom;
+	vCameraOffset = m_pTerrain->vCameraOffset;
 
 	m_tInfo.vPos.x = 400.f;
 	m_tInfo.vPos.y = 300.f;
@@ -40,7 +34,7 @@ void CObj::Update()
 {
 	DWORD CurrentTime = GetTickCount();
 
-	if (CurrentTime - m_AnimeTime > 300)
+	if (CurrentTime - m_AnimeTime > 100)
 	{
 		m_tFrame.fFrame = float((int)(m_tFrame.fFrame + 1.f) % (int)m_tFrame.fMax);
 		m_AnimeTime = CurrentTime;

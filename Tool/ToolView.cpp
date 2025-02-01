@@ -25,6 +25,7 @@
 #include "CKeyManager.h"
 #include "CUndoManager.h"
 #include "CMyForm.h"
+#include "ConsoleWindow.h"
 
 HWND	g_hWnd;
 
@@ -47,9 +48,11 @@ BEGIN_MESSAGE_MAP(CToolView, CView)
 END_MESSAGE_MAP()
 
 // CToolView 생성/소멸
-
+static int iCount = 0;
 CToolView::CToolView() noexcept
-	: m_pDevice(CDevice::Get_Instance()), m_pTerrain(nullptr), m_nTimer(0), m_fSrollSpeed(0.f), m_fAlpha(0.f), m_dwDisplayTime(0), m_pObj(nullptr)
+	: m_pDevice(CDevice::Get_Instance()),
+	m_pTerrain(nullptr), m_nTimer(0), m_fSrollSpeed(0.f),
+	m_fAlpha(0.f), m_dwDisplayTime(0), m_pObj(nullptr), m_bIsObj(false)
 	//, m_pSingle(nullptr)
 
 {
@@ -64,6 +67,7 @@ CToolView::~CToolView()
 void CToolView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
+	ConsoleWindow::Create();
 	m_nTimer = SetTimer(1, 16, NULL);
 	// AfxGetMainWnd : 현재 메인 윈도우의 값을 반환하는 전역함수
 
@@ -125,6 +129,7 @@ void CToolView::OnInitialUpdate()
 
 	if (!m_pObj)
 	{
+		iCount++;
 		m_pObj = new CObj;
 		m_pObj->Initialize();
 	}
@@ -142,16 +147,20 @@ void CToolView::OnLButtonDown(UINT nFlags, CPoint point)
 			return;
 	}
 
-	m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+
+		m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f),m_bIsObj,m_bIsTileMode);
 
 	//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 	CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
-	if (m_pObj)
+	if (m_pObj && m_bIsObj)
 	{
+		CUndoManager::Get_Instance()->SaveState(UndoType::OBJ);
 		m_pObj->Picking_Obj();
 		CObjManager::Get_Instance()->Add_Obj(m_pObj);
 		m_pObj = new CObj;
 		m_pObj->Initialize();
+		iCount++;
+		m_bIsObj = false;
 	}
 	pMiniView->Invalidate(FALSE);
 }
@@ -166,47 +175,9 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 
 	m_pDevice->Render_Begin();
 
-
-	//m_pDevice->Get_Sprite()->SetTransform(&matWorld);
-
-	// float	fCenterX = m_pSingle->Get_Texture()->tImgInfo.Width / 2.f;
-	// float	fCenterY = m_pSingle->Get_Texture()->tImgInfo.Height / 2.f;
-
-	//const TEXINFO* pTexInfo = CTextureMgr::Get_Instance()->Get_Texture(L"Terrain", L"Tile", 7);
-
-	//float	fCenterX = pTexInfo->tImgInfo.Width / 2.f;
-	//float	fCenterY = pTexInfo->tImgInfo.Height / 2.f;
-
-	//D3DXVECTOR3	vTemp{ fCenterX, fCenterY, 0.f };
-
-	//m_pDevice->Get_Sprite()->Draw(pTexInfo->pTexture, //출력할 텍스처 컴객체
-	//								nullptr,		// 출력할 이미지 영역에 대한 Rect 주소, null인 경우 이미지의 0, 0기준으로 출력
-	//								&vTemp,		// 출력할 이미지의 중심 좌표 vec3 주소, null인 경우 0, 0 이미지 중심
-	//								nullptr,		// 위치 좌표에 대한 vec3 주소, null인 경우 스크린 상 0, 0 좌표 출력	
-	//								D3DCOLOR_ARGB(255, 255, 255, 255)); // 출력할 이미지와 섞을 색상 값, 0xffffffff를 넘겨주면 섞지 않고 원본 색상 유지
-	m_pTerrain->Update();
 	m_pTerrain->Render();
-
 	m_pObj->Render();
 	CObjManager::Get_Instance()->Render();
-	// 폰트의 출력 위치를 조정 가능
-	// D3DXMatrixTranslation(&matTrans, 200.f, 200.f, 0.f);
-	// m_pDevice->Get_Sprite()->SetTransform(&matTrans);
-
-	//TCHAR	szBuf[MIN_STR] = L"";
-
-	//int	iNumber = 1000;
-
-	//swprintf_s(szBuf, L"%d", iNumber);
-
-	//m_pDevice->Get_Font()->DrawTextW(m_pDevice->Get_Sprite(),
-	//	szBuf,		// 출력할 문자열
-	//	lstrlen(szBuf),  // 문자열 버퍼의 크기
-	//	nullptr,	// 출력할 렉트 위치
-	//	0,			// 정렬 기준(옵션)
-	//	D3DCOLOR_ARGB(255, 255, 255, 255));
-
-	CDevice::Get_Instance()->Get_Sprite()->Begin(D3DXSPRITE_ALPHABLEND);
 	TCHAR szSpeed[32];
 	float fDeltaTime = (GetTickCount64() - m_dwDisplayTime) / 1000.0f;
 	m_fAlpha = max(0.0f, 255.0f - (fDeltaTime * 85.0f)); // 3초에 걸쳐 사라짐
@@ -229,15 +200,13 @@ void CToolView::OnDraw(CDC* /*pDC*/)
 		DT_CENTER,
 		D3DCOLOR_ARGB((BYTE)m_fAlpha, 255, 255, 255));
 	m_pDevice->Render_End();
-
-
 }
 
 void CToolView::OnDestroy()
 {
 	KillTimer(m_nTimer);
 	CView::OnDestroy();
-
+	ConsoleWindow::Destroy();
 	Safe_Delete(m_pObj);
 	CObjManager::Destroy_Instance();
 	CKeyManager::Destroy_Instance();
@@ -352,7 +321,7 @@ void CToolView::OnTimer(UINT_PTR nIDEvent)
 		// 게임 로직 업데이트
 		if (m_pDevice)
 		{
-
+			cout << iCount << endl;
 			m_pTerrain->Update();
 			if (CKeyManager::Get_Instance()->Key_Pressing('A'))
 			{
@@ -429,15 +398,17 @@ void CToolView::OnMouseMove(UINT nFlags, CPoint point)
 				return;
 		}
 
-		m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
-		
+			m_pTerrain->Picking_Tile(D3DXVECTOR3((float)point.x, (float)point.y, 0.f),m_bIsObj,m_bIsTileMode);
 		//	CMainFrame* pMainFrm = dynamic_cast<CMainFrame*>(GetParentFrame());
 		CMiniView* pMiniView = dynamic_cast<CMiniView*>(pMainFrm->m_SecondSplitter.GetPane(0, 0));
 
 		pMiniView->Invalidate(FALSE);
 	}
 
-	m_pObj->Set_Position(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+	if (m_bIsObj)
+	{
+		m_pObj->Set_Position(D3DXVECTOR3((float)point.x, (float)point.y, 0.f));
+	}
 
 	CView::OnMouseMove(nFlags, point);
 }
