@@ -256,6 +256,9 @@
     <None Include="res\Tool.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\maxresdefault.ico" />
+    <Image Include="res\icon1.ico" />
+    <Image Include="res\icon2.ico" />
     <Image Include="res\Tool.ico" />
     <Image Include="res\Toolbar.bmp" />
     <Image Include="res\ToolDoc.ico" />

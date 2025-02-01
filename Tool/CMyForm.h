@@ -2,6 +2,7 @@
 #include "CUnitTool.h"
 #include "CTextureListBox.h"
 #include "CFindFolderTree.h"
+#include "CObjManager.h"
 #include "Include.h"
 
 
@@ -31,6 +32,8 @@ public:
 	CUnitTool	m_UnitTool;
 	void SaveTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName);
 	void LoadTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName);
+	void SaveMapData(vector<TILE>& vecTile, vector<CObj*>& vecObj, const CString& strFolderPath, const CString& strFileName);
+	void LoadMapData(vector<TILE>& vecTile, vector<CObj*>& vecObj, const CString& strFolderPath, const CString& strFileName);
 	void OnButtonObjectList();
 	void OnButtonTileList();
 protected:

@@ -17,7 +17,6 @@ public:
 	{
 		m_tInfo = other.m_tInfo;
 		m_tFrame = other.m_tFrame;
-		m_LineIndex = other.m_LineIndex;
 		fCameraZoom = other.fCameraZoom;
 		vCameraOffset = other.vCameraOffset;
 	}
@@ -34,7 +33,6 @@ public:
 		m_strObjKey = other.m_strObjKey;
 		m_tInfo = other.m_tInfo;
 		m_tFrame = other.m_tFrame;
-		m_LineIndex = other.m_LineIndex;
 		fCameraZoom = other.fCameraZoom;
 		vCameraOffset = other.vCameraOffset;
 		return *this;
@@ -50,7 +48,6 @@ public:
 		m_strObjKey = other.m_strObjKey;
 		m_tInfo = other.m_tInfo;
 		m_tFrame = other.m_tFrame;
-		m_LineIndex = other.m_LineIndex;
 		fCameraZoom = other.fCameraZoom;
 		vCameraOffset = other.vCameraOffset;
 	}
@@ -72,6 +69,8 @@ public:
 	void Set_Terrain(CTerrain* _Terrain) { m_pTerrain = _Terrain; }
 	void Set_Ratio(D3DXMATRIX& pOut, float _fX, float _fY);
 	void Set_Sprite(const wstring& strStateKey, const wstring& strObjKey,int iMaxFrame);
+
+	void Serialize(CArchive& ar);
 public:
 	wstring m_strStateKey;
 	wstring m_strObjKey;
@@ -83,8 +82,6 @@ public:
 	FRAME   m_tFrame;
 	DWORD	m_AnimeTime;
 
-
-	int m_LineIndex;
 	CTerrain* m_pTerrain;
 private:
 

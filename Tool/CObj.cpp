@@ -21,17 +21,13 @@ void CObj::Initialize()
 	m_pTerrain = m_pMainView->m_pTerrain;
 	fCameraZoom = m_pTerrain->fCameraZoom;
 	vCameraOffset = m_pTerrain->vCameraOffset;
-
-	m_tInfo.vPos.x = 400.f;
-	m_tInfo.vPos.y = 300.f;
-
-	m_tFrame.fFrame = 0.f;
-	m_tFrame.fMax = 13.f;
 	m_bIsSet = false;
 }
 
 void CObj::Update()
 {
+	if (m_strObjKey == L"")
+		return;
 	DWORD CurrentTime = GetTickCount();
 
 	if (CurrentTime - m_AnimeTime > 100)
@@ -134,4 +130,52 @@ void CObj::Set_Sprite(const wstring& strStateKey, const wstring& strObjKey, int 
 	m_strObjKey = strObjKey;
 	m_tFrame.fMax = (float)iMaxFrame;
 	m_tFrame.fFrame = 0.f;
+}
+
+void CObj::Serialize(CArchive& ar)
+{
+	if (ar.IsStoring()) // 저장할 때
+	{	
+
+		int strLength = m_strStateKey.length(); // 문자열 길이 저장
+		ar << strLength;
+		for (wchar_t ch : m_strStateKey)
+		{
+			ar << ch;
+		}
+		strLength = m_strObjKey.length();
+
+		ar << strLength;
+		for (wchar_t ch : m_strObjKey)
+		{
+			ar << ch;
+		}
+		ar << m_bIsSet;
+		ar << m_tInfo.vPos.x << m_tInfo.vPos.y << m_tInfo.vPos.z;	
+		ar << m_tFrame.fFrame << m_tFrame.fMax;
+	}
+	else // 불러올 때
+	{
+		int strLength = 0;
+		ar >> strLength;
+		m_strStateKey.clear();
+		for (int i = 0; i < strLength; ++i)
+		{
+			wchar_t ch;
+			ar >> ch;
+			m_strStateKey += ch;
+		}
+		strLength = 0;
+		ar >> strLength;
+		m_strObjKey.clear();
+		for (int i = 0; i < strLength; ++i)
+		{
+			wchar_t ch;
+			ar >> ch;
+			m_strObjKey += ch;
+		}
+		ar >> m_bIsSet;
+		ar >> m_tInfo.vPos.x >> m_tInfo.vPos.y >> m_tInfo.vPos.z;
+		ar >> m_tFrame.fFrame >> m_tFrame.fMax;
+	}
 }
