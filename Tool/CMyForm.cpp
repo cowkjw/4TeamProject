@@ -141,7 +141,8 @@ void CMyForm::OnBnClickedButton3()
 
 	CTerrain* pTerrain = pView->m_pTerrain;
 
-	SaveTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
+	//SaveTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
+	SaveMapData(pTerrain->m_vecTile, CObjManager::Get_Instance()->m_vecObj, _T("../Data"), _T("mapData.dat"));
 }
 
 //Load 버튼
@@ -152,7 +153,8 @@ void CMyForm::OnBnClickedButton4()
 
 	CTerrain* pTerrain = pView->m_pTerrain;
 
-	LoadTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
+	//LoadTileData(pTerrain->m_vecTile, _T("../Data"), _T("tileDate.dat"));
+	LoadMapData(pTerrain->m_vecTile, CObjManager::Get_Instance()->m_vecObj, _T("../Data"), _T("mapData.dat"));
 }
 
 void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName)
@@ -187,6 +189,9 @@ void CMyForm::SaveTileData(vector<TILE>& vecTile, const CString& strFolderPath, 
 	}
 	Ar.Close();
 	File.Close();
+	CString strSuccess;
+	strSuccess.Format(_T("파일이 성공적으로 저장되었습니다.\n저장 경로: %s"), strFullPath);
+	MessageBox(strSuccess, _T("저장 완료"), MB_ICONINFORMATION);
 }
 
 void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& strFolderPath, const CString& strFileName)
@@ -224,4 +229,123 @@ void CMyForm::LoadTileData(vector<TILE>& vecTile, const CString& strFolderPath, 
 	}
 	Ar.Close();
 	File.Close();
+
+	CString strSuccess;
+	strSuccess.Format(_T("파일을 성공적으로 불러왔습니다.\n파일 경로: %s"), strFullPath);
+	MessageBox(strSuccess, _T("로드 완료"), MB_ICONINFORMATION);
+}
+
+void CMyForm::SaveMapData(vector<TILE>& vecTile, vector<CObj*>& vecObj, const CString& strFolderPath, const CString& strFileName)
+{
+	if (!PathFileExists(strFolderPath))
+	{
+		if (!CreateDirectory(strFolderPath, NULL))
+		{
+			AfxMessageBox(_T("폴더 생성에 실패했습니다."));
+			return;
+		}
+	}
+
+	// 전체 경로 생성
+	CString strFullPath;
+	strFullPath.Format(_T("%s\\%s"), strFolderPath, strFileName);
+
+	CFile File;
+	if (!File.Open(strFullPath, CFile::modeCreate | CFile::modeWrite))
+	{
+		AfxMessageBox(_T("파일을 생성할 수 없습니다."));
+		return;
+	}
+
+	CArchive Ar(&File, CArchive::store);
+
+	// 타일 데이터 저장
+	int iTileCount = vecTile.size();
+	Ar << iTileCount;
+	for (int i = 0; i < iTileCount; ++i)
+	{
+		vecTile[i].Serialize(Ar);
+	}
+
+	// 오브젝트 데이터 저장
+	int iObjCount = vecObj.size();
+	Ar << iObjCount;
+	for (int i = 0; i < iObjCount; ++i)
+	{
+		if (vecObj[i])
+			vecObj[i]->Serialize(Ar);
+	}
+
+	Ar.Close();
+	File.Close();
+
+	CString strSuccess;
+	strSuccess.Format(_T("맵 데이터가 성공적으로 저장되었습니다.\n저장 경로: %s"), strFullPath);
+	MessageBox(strSuccess, _T("저장 완료"), MB_ICONINFORMATION);
+}
+
+void CMyForm::LoadMapData(vector<TILE>& vecTile, vector<CObj*>& vecObj, const CString& strFolderPath, const CString& strFileName)
+{
+	CString strFullPath;
+	strFullPath.Format(_T("%s\\%s"), strFolderPath, strFileName);
+
+	// 폴더 경로 확인
+	if (!PathFileExists(strFolderPath))
+	{
+		AfxMessageBox(_T("파일이 없습니다."));
+		return;
+	}
+
+	CFile File;
+	if (!File.Open(strFullPath, CFile::modeRead))
+	{
+		AfxMessageBox(_T("파일을 열 수 없습니다."));
+		return;
+	}
+
+	CArchive Ar(&File, CArchive::load);
+
+	// 현재 상태 저장 (실행 취소를 위해)
+	CUndoManager::Get_Instance()->SaveState(UndoType::TILE);
+	CUndoManager::Get_Instance()->SaveState(UndoType::OBJ);
+
+	// 타일 데이터 로드
+	int iTileCount = 0;
+	Ar >> iTileCount;
+	vecTile.clear();
+	vecTile.resize(iTileCount);
+	for (int i = 0; i < iTileCount; ++i)
+	{
+		vecTile[i].Serialize(Ar);
+	}
+
+	// 오브젝트 데이터 로드
+	int iObjCount = 0;
+	Ar >> iObjCount;
+
+	// 기존 오브젝트 메모리 해제
+	for (auto& pObj : vecObj)
+	{
+		if (pObj)
+		{
+			delete pObj;
+		}
+	}
+	vecObj.clear();
+
+	// 새 오브젝트 생성 및 로드
+	for (int i = 0; i < iObjCount; ++i)
+	{
+		CObj* pNewObj = new CObj;
+		pNewObj->Initialize();
+		pNewObj->Serialize(Ar);
+		vecObj.push_back(pNewObj);
+	}
+
+	Ar.Close();
+	File.Close();
+
+	CString strSuccess;
+	strSuccess.Format(_T("맵 데이터를 성공적으로 불러왔습니다.\n파일 경로: %s"), strFullPath);
+	MessageBox(strSuccess, _T("로드 완료"), MB_ICONINFORMATION);
 }

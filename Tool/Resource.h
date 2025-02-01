@@ -10,6 +10,7 @@
 #define IDD_CUnitTool                   311
 #define IDD_CTransformInfo              312
 #define IDD_CFindFolderTree             313
+#define IDI_ICON1                       324
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_LIST1                       1003
@@ -40,9 +41,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        317
+#define _APS_NEXT_RESOURCE_VALUE        325
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1020
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           314
 #endif
 #endif

@@ -113,6 +113,7 @@ END_MESSAGE_MAP()
 BOOL CFindFolderTree::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	SetWindowText(_T("텍스쳐 찾기"));
 	CString path = _T("../Texture");
 	if (PathFileExists(path))
 	{
