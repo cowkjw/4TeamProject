@@ -58,6 +58,7 @@ BEGIN_MESSAGE_MAP(CMyForm, CFormView)
 	ON_BN_CLICKED(IDC_BUTTON5, &CMyForm::OnButtonTileList)
 	ON_BN_CLICKED(IDC_BUTTON3, &CMyForm::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON4, &CMyForm::OnBnClickedButton4)
+	ON_BN_CLICKED(IDC_CHECK1, &CMyForm::OnBnClickedCheck1)
 END_MESSAGE_MAP()
 
 
@@ -348,4 +349,14 @@ void CMyForm::LoadMapData(vector<TILE>& vecTile, vector<CObj*>& vecObj, const CS
 	CString strSuccess;
 	strSuccess.Format(_T("맵 데이터를 성공적으로 불러왔습니다.\n파일 경로: %s"), strFullPath);
 	MessageBox(strSuccess, _T("로드 완료"), MB_ICONINFORMATION);
+}
+
+
+void CMyForm::OnBnClickedCheck1()
+{
+	CMainFrame* pMainFrm = (CMainFrame*)AfxGetMainWnd();
+	CToolView* pView = dynamic_cast<CToolView*>(pMainFrm->m_ThirdSplitter.GetPane(0, 0));
+
+	CTerrain* pTerrain = pView->m_pTerrain;
+	pTerrain->m_bOnGrid = !pTerrain->m_bOnGrid;
 }

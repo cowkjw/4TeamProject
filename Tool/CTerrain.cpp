@@ -9,7 +9,7 @@
 #include "CKeyManager.h"
 
 CTerrain::CTerrain() :
-	m_bCanRender(false), m_pLine(nullptr), m_bIsPicking(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
+	m_bCanRender(false), m_bOnGrid(true), m_pLine(nullptr), m_bIsPicking(false), m_pMainView(nullptr), m_pMiniView(nullptr), m_iChangeDrawId(0), m_dwContinuousTime(0ULL),
 	m_dwDrawTileRenderTime(0ULL), vCameraOffset(D3DXVECTOR2(0.f, 0.f)), fCameraZoom(1.0f), m_LineIndex(0)
 {
 }
@@ -22,7 +22,7 @@ CTerrain::~CTerrain()
 void CTerrain::Initialize()
 {
 	D3DXCreateLine(CDevice::Get_Instance()->Get_Device(), &m_pLine);
-
+	m_bOnGrid = true;
 	//if (FAILED(CTextureMgr::Get_Instance()->Insert_Texture(
 	//	L"../Texture/Stage/Terrain/Tile/Act2/Tile_%d.png",
 	//	TEX_MULTI, L"Tile", L"Act2", 108)))
@@ -142,7 +142,10 @@ void CTerrain::Render()
 		iIndex++;
 	}
 
-	DrawDiamondGrid();
+	if (m_bOnGrid)
+	{
+		DrawDiamondGrid();
+	}	
 }
 
 void CTerrain::Release()
