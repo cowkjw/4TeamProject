@@ -123,19 +123,19 @@ void CTerrain::Render()
 
 		D3DXVECTOR3	vTemp{ fCenterX, fCenterY, 0.f };
 
-		CDevice::Get_Instance()->Get_Sprite()->Draw(pTexInfo->pTexture, //Ãâ·ÂÇÒ ÅØ½ºÃ³ ÄÄ°´Ã¼
-			nullptr,		// Ãâ·ÂÇÒ ÀÌ¹ÌÁö ¿µ¿ª¿¡ ´ëÇÑ Rect ÁÖ¼Ò, nullÀÎ °æ¿ì ÀÌ¹ÌÁöÀÇ 0, 0±âÁØÀ¸·Î Ãâ·Â
-			&vTemp,		// Ãâ·ÂÇÒ ÀÌ¹ÌÁöÀÇ Áß½É ÁÂÇ¥ vec3 ÁÖ¼Ò, nullÀÎ °æ¿ì 0, 0 ÀÌ¹ÌÁö Áß½É
-			nullptr,		// À§Ä¡ ÁÂÇ¥¿¡ ´ëÇÑ vec3 ÁÖ¼Ò, nullÀÎ °æ¿ì ½ºÅ©¸° »ó 0, 0 ÁÂÇ¥ Ãâ·Â	
-			D3DCOLOR_ARGB(255, 255, 255, 255)); // Ãâ·ÂÇÒ ÀÌ¹ÌÁö¿Í ¼¯À» »ö»ó °ª, 0xffffffff¸¦ ³Ñ°ÜÁÖ¸é ¼¯Áö ¾Ê°í ¿øº» »ö»ó À¯Áö
+		CDevice::Get_Instance()->Get_Sprite()->Draw(pTexInfo->pTexture, //ì¶œë ¥í•  í…ìŠ¤ì²˜ ì»´ê°ì²´
+			nullptr,		// ì¶œë ¥í•  ì´ë¯¸ì§€ ì˜ì—­ì— ëŒ€í•œ Rect ì£¼ì†Œ, nullì¸ ê²½ìš° ì´ë¯¸ì§€ì˜ 0, 0ê¸°ì¤€ìœ¼ë¡œ ì¶œë ¥
+			&vTemp,		// ì¶œë ¥í•  ì´ë¯¸ì§€ì˜ ì¤‘ì‹¬ ì¢Œí‘œ vec3 ì£¼ì†Œ, nullì¸ ê²½ìš° 0, 0 ì´ë¯¸ì§€ ì¤‘ì‹¬
+			nullptr,		// ìœ„ì¹˜ ì¢Œí‘œì— ëŒ€í•œ vec3 ì£¼ì†Œ, nullì¸ ê²½ìš° ìŠ¤í¬ë¦° ìƒ 0, 0 ì¢Œí‘œ ì¶œë ¥	
+			D3DCOLOR_ARGB(255, 255, 255, 255)); // ì¶œë ¥í•  ì´ë¯¸ì§€ì™€ ì„ì„ ìƒ‰ìƒ ê°’, 0xffffffffë¥¼ ë„˜ê²¨ì£¼ë©´ ì„ì§€ ì•Šê³  ì›ë³¸ ìƒ‰ìƒ ìœ ì§€
 
 		swprintf_s(szBuf, L"%d", iIndex);
 
 		CDevice::Get_Instance()->Get_Font()->DrawTextW(CDevice::Get_Instance()->Get_Sprite(),
-			szBuf,		// Ãâ·ÂÇÒ ¹®ÀÚ¿­
-			lstrlen(szBuf),  // ¹®ÀÚ¿­ ¹öÆÛÀÇ Å©±â
-			nullptr,	// Ãâ·ÂÇÒ ·ºÆ® À§Ä¡
-			0,			// Á¤·Ä ±âÁØ(¿É¼Ç)
+			szBuf,		// ì¶œë ¥í•  ë¬¸ìì—´
+			lstrlen(szBuf),  // ë¬¸ìì—´ ë²„í¼ì˜ í¬ê¸°
+			nullptr,	// ì¶œë ¥í•  ë ‰íŠ¸ ìœ„ì¹˜
+			0,			// ì •ë ¬ ê¸°ì¤€(ì˜µì…˜)
 			D3DCOLOR_ARGB(255, 255, 255, 255));
 
 		iIndex++;
@@ -199,11 +199,11 @@ void CTerrain::Mini_Render()
 
 		D3DXVECTOR3	vTemp{ fCenterX, fCenterY, 0.f };
 
-		CDevice::Get_Instance()->Get_Sprite()->Draw(pTexInfo->pTexture, //Ãâ·ÂÇÒ ÅØ½ºÃ³ ÄÄ°´Ã¼
-			nullptr,		// Ãâ·ÂÇÒ ÀÌ¹ÌÁö ¿µ¿ª¿¡ ´ëÇÑ Rect ÁÖ¼Ò, nullÀÎ °æ¿ì ÀÌ¹ÌÁöÀÇ 0, 0±âÁØÀ¸·Î Ãâ·Â
-			&vTemp,		// Ãâ·ÂÇÒ ÀÌ¹ÌÁöÀÇ Áß½É ÁÂÇ¥ vec3 ÁÖ¼Ò, nullÀÎ °æ¿ì 0, 0 ÀÌ¹ÌÁö Áß½É
-			nullptr,		// À§Ä¡ ÁÂÇ¥¿¡ ´ëÇÑ vec3 ÁÖ¼Ò, nullÀÎ °æ¿ì ½ºÅ©¸° »ó 0, 0 ÁÂÇ¥ Ãâ·Â	
-			D3DCOLOR_ARGB(255, 255, 255, 255)); // Ãâ·ÂÇÒ ÀÌ¹ÌÁö¿Í ¼¯À» »ö»ó °ª, 0xffffffff¸¦ ³Ñ°ÜÁÖ¸é ¼¯Áö ¾Ê°í ¿øº» »ö»ó À¯Áö
+		CDevice::Get_Instance()->Get_Sprite()->Draw(pTexInfo->pTexture, //ì¶œë ¥í•  í…ìŠ¤ì²˜ ì»´ê°ì²´
+			nullptr,		// ì¶œë ¥í•  ì´ë¯¸ì§€ ì˜ì—­ì— ëŒ€í•œ Rect ì£¼ì†Œ, nullì¸ ê²½ìš° ì´ë¯¸ì§€ì˜ 0, 0ê¸°ì¤€ìœ¼ë¡œ ì¶œë ¥
+			&vTemp,		// ì¶œë ¥í•  ì´ë¯¸ì§€ì˜ ì¤‘ì‹¬ ì¢Œí‘œ vec3 ì£¼ì†Œ, nullì¸ ê²½ìš° 0, 0 ì´ë¯¸ì§€ ì¤‘ì‹¬
+			nullptr,		// ìœ„ì¹˜ ì¢Œí‘œì— ëŒ€í•œ vec3 ì£¼ì†Œ, nullì¸ ê²½ìš° ìŠ¤í¬ë¦° ìƒ 0, 0 ì¢Œí‘œ ì¶œë ¥	
+			D3DCOLOR_ARGB(255, 255, 255, 255)); // ì¶œë ¥í•  ì´ë¯¸ì§€ì™€ ì„ì„ ìƒ‰ìƒ ê°’, 0xffffffffë¥¼ ë„˜ê²¨ì£¼ë©´ ì„ì§€ ì•Šê³  ì›ë³¸ ìƒ‰ìƒ ìœ ì§€
 	}
 }
 
@@ -253,12 +253,12 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint, bool bIsObjPick, bool
 		}
 	}
 
-	// ¶óÀÎÀ» Ã£¾Ò´Ù¸é
+	// ë¼ì¸ì„ ì°¾ì•˜ë‹¤ë©´
 	if (pickedLineIndex != -1)
 	{
-		m_LineIndex = pickedLineIndex;  // Ç×»ó ¶óÀÎ ÀÎµ¦½º ¾÷µ¥ÀÌÆ®
+		m_LineIndex = pickedLineIndex;  // í•­ìƒ ë¼ì¸ ì¸ë±ìŠ¤ ì—…ë°ì´íŠ¸
 
-		// ÀÌ¹Ì Å¸ÀÏÀÌ ÀÖ´ÂÁö È®ÀÎ
+		// ì´ë¯¸ íƒ€ì¼ì´ ìˆëŠ”ì§€ í™•ì¸
 		bool tileExists = false;
 		for (auto& pTile : m_vecTile)
 		{
@@ -268,7 +268,7 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint, bool bIsObjPick, bool
 				0.f
 			};
 
-			// Å¸ÀÏÀÇ Áß½ÉÁ¡ÀÌ ÀÏÄ¡ÇÏ´ÂÁö È®ÀÎ
+			// íƒ€ì¼ì˜ ì¤‘ì‹¬ì ì´ ì¼ì¹˜í•˜ëŠ”ì§€ í™•ì¸
 			if (abs(pTile.vPos.x - tileCenter.x) < 0.1f &&
 				abs(pTile.vPos.y - tileCenter.y) < 0.1f)
 			{
@@ -284,7 +284,7 @@ void CTerrain::Picking_Tile(const D3DXVECTOR3& mousePoint, bool bIsObjPick, bool
 			}
 		}
 
-		// Å¸ÀÏÀÌ ¾ø´Ù¸é »õ·Î »ı¼º
+		// íƒ€ì¼ì´ ì—†ë‹¤ë©´ ìƒˆë¡œ ìƒì„±
 		if (!tileExists && !bIsObjPick&& bOnTileMode)
 		{
 			TILE newTile(
@@ -329,7 +329,7 @@ void CTerrain::Generate_Grid(int width, int height, int minRoomSize)
 
 void CTerrain::Serialize(CArchive& ar)
 {
-	if (ar.IsStoring()) // ÀúÀåÇÒ ¶§
+	if (ar.IsStoring()) // ì €ì¥í•  ë•Œ
 	{
 		int iCount = (int)m_vecLine.size();
 		ar << iCount;
@@ -344,7 +344,7 @@ void CTerrain::Serialize(CArchive& ar)
 			}
 		}
 	}
-	else // ºÒ·¯¿Ã ¶§
+	else // ë¶ˆëŸ¬ì˜¬ ë•Œ
 	{
 		int iCount = 0;
 		ar >> iCount;
@@ -387,8 +387,8 @@ void CTerrain::Render_Current_Draw_Tile()
 	CDevice::Get_Instance()->Get_Sprite()->SetTransform(&matWorld);
 	CDevice::Get_Instance()->Get_Sprite()->Draw(pTexInfo->pTexture,
 		nullptr,
-		&vCenter,   // ÅØ½ºÃ³ÀÇ Áß½ÉÁ¡    
-		nullptr,    // ÀÌ¹Ì matWorld·Î À§Ä¡¸¦ ¼³Á¤ÇßÀ¸¹Ç·Î nullptr
+		&vCenter,   // í…ìŠ¤ì²˜ì˜ ì¤‘ì‹¬ì     
+		nullptr,    // ì´ë¯¸ matWorldë¡œ ìœ„ì¹˜ë¥¼ ì„¤ì •í–ˆìœ¼ë¯€ë¡œ nullptr
 		D3DCOLOR_ARGB(255, 255, 255, 255));
 }
 
@@ -447,7 +447,7 @@ void CTerrain::DrawDiamondGrid()
 	if (!m_pLine) return;
 
 	m_pLine->SetWidth(2.0f);
-	m_pLine->SetAntialias(TRUE); // ¾ÈÆ¼¾Ù¸®¾î½Ì Å°±â
+	m_pLine->SetAntialias(TRUE); // ì•ˆí‹°ì•¨ë¦¬ì–´ì‹± í‚¤ê¸°
 	m_pLine->SetGLLines(TRUE);
 
 	RECT	rc{};
@@ -459,61 +459,8 @@ void CTerrain::DrawDiamondGrid()
 
 	// Draw grid
 	m_pLine->Begin();
-	
 
-	//ÀÏ´Ü Ä«¸Ş¶ó ¿ÀÇÁ¼ÂÀº ¹èÁ¦ÇÏ°í »ı°¢Çß¾î
-	//iTerm 20À¸·Î °íÁ¤ÀÓ(20ÀÌ¾î¾ß ´ÙÀ½ Çà¿¡¼­ ¶óÀÎÀÌ ±×·ÁÁü)
-	int iTerm = 20;
-	//iTerm2 ÀÌ °ªÀ» Á¶Á¤ÇØ Áà¾ßÇØ(Áö±İÀº Ä«¸Ş¶ó ÁÜÀÌ 1ÀÎ »óÅÂ±âÁØÀÌ°í µÚÂÊ¿¡ Ä«¸Ş¶ó ÁÜÀ¸·Î ¿¬»êÇØÁà¾ßÇÔ)
-	//Ä«¸Ş¶ó ÁÜÀÌ 1ÀÏ¶§ ±âÁØ iTerm2 = 800 / 160 = 5 ¿©¼­ ÇÑ Çà¿¡ 5°³¾¿ ±×·ÁÁü
-	int iTerm2 = 800 / TILECX;
 
-	//¹İº¹¹®1(¾Æ·¡ÂÊÀº ¶È°°Àº Çü½ÄÀÇ ¹İº¹¹®)
-	for (int i = 0; i < iTerm2; ++i)
-	{
-		auto arrLine = m_vecLine[i];
-
-		for (size_t i = 0; i < arrLine.size(); ++i)
-		{
-			arrLine[i].x = fX * fCameraZoom * (arrLine[i].x - vCameraOffset.x);
-			arrLine[i].y = fY * fCameraZoom * (arrLine[i].y - vCameraOffset.y);
-		}
-
-		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));
-	}
-
-	//¹İº¹¹®2(¾Æ·¡ÂÊÀº ¶È°°Àº Çü½ÄÀÇ ¹İº¹¹®)
-	for (int i = iTerm; i < iTerm + iTerm2; ++i)
-	{
-		auto arrLine = m_vecLine[i];
-
-		for (size_t i = 0; i < arrLine.size(); ++i)
-		{
-			arrLine[i].x = fX * fCameraZoom * (arrLine[i].x - vCameraOffset.x);
-			arrLine[i].y = fY * fCameraZoom * (arrLine[i].y - vCameraOffset.y);
-		}
-
-		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));
-	}
-
-	//¹İº¹¹®3
-	for (int i = 2 * iTerm; i < 2 * iTerm + iTerm2; ++i)
-	{
-		auto arrLine = m_vecLine[i];
-
-		for (size_t i = 0; i < arrLine.size(); ++i)
-		{
-			arrLine[i].x = fX * fCameraZoom * (arrLine[i].x - vCameraOffset.x);
-			arrLine[i].y = fY * fCameraZoom * (arrLine[i].y - vCameraOffset.y);
-		}
-
-		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));
-	}
-
-	//¹İº¹¹®À» µÎ ¹ø µ¹¸±¶§¸¶´Ù ÇÑ Çà¾¿ ¶óÀÎÀÌ ±×·ÁÁü(ÇÑ ¹ø µ¹¸±¶§¸¶´Ù Àı¹İ¾¿¸¸ ³ª¿À´õ¶ó)
-	//¹İº¹¹® µ¹¸®´Â È½¼ö¶û iTerm2 °ª ¿¬»ê½Ä Á¶Á¤ÇÏ¸é ÇØ°áµÉµí
-
-	/*for (auto& line : m_vecLine)
 	{
 		auto arrLine = line;
 
@@ -524,7 +471,7 @@ void CTerrain::DrawDiamondGrid()
 		}
 
 		m_pLine->Draw(arrLine.data(), 5, D3DCOLOR_ARGB(255, 0, 255, 0));
-	}*/
+	}
 
 	m_pLine->End();
 }
